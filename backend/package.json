@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "server": "nodemon index.js",
+    "build": "echo 'Build process for frontend if needed'",
     "data:import": "node seeder.js",
     "data:destroy": "node seeder.js -d"
   },
