@@ -54,7 +54,7 @@ const SearchBox = () => {
                         type="text"
                         name="q"
                         onChange={(e) => setKeyword(e.target.value)}
-                        placeholder="Search premium electronics..."
+                        placeholder="Search home textiles..."
                         className="w-full bg-transparent border-none focus:ring-0 py-2 pl-10 pr-4 text-sm transition-all outline-none"
                     />
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

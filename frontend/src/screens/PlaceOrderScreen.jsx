@@ -12,8 +12,8 @@ const PlaceOrderScreen = () => {
 
     // Calculate prices
     const itemsPrice = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
-    const shippingPrice = itemsPrice > 500 ? 0 : 50;
     const taxPrice = Number((0.18 * itemsPrice).toFixed(2));
+    const shippingPrice = (itemsPrice + taxPrice) > 1000 ? 0 : 50;
     const totalPrice = itemsPrice + shippingPrice + taxPrice;
 
     useEffect(() => {
@@ -83,7 +83,7 @@ const PlaceOrderScreen = () => {
                 key: keyId,
                 amount: razorpayOrder.amount,
                 currency: razorpayOrder.currency,
-                name: 'Adhithya Electronics',
+                name: 'Bombay Dyeing - NKM Trading Company',
                 description: 'Payment for Order ' + order._id,
                 order_id: razorpayOrder.id,
                 handler: function (response) {

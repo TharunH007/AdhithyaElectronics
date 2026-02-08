@@ -53,7 +53,26 @@ const registerUser = async (req, res) => {
     const userExists = await User.findOne({ email });
 
     if (userExists) {
-        return res.status(400).json({ message: 'User already exists' });
+        if (userExists.isEmailVerified) {
+            return res.status(400).json({ message: 'User already exists' });
+        } else {
+            // Update token for existing unverified user instead of blocking
+            const verificationToken = generateEmailVerificationToken();
+            const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+            userExists.name = name;
+            userExists.password = password;
+            userExists.phone = phone;
+            userExists.emailVerificationToken = verificationToken;
+            userExists.emailVerificationExpires = verificationExpires;
+            await userExists.save();
+
+            await sendVerificationEmail(userExists, verificationToken);
+            return res.status(200).json({
+                message: 'Account exists but unverified. A new verification email has been sent.',
+                email: userExists.email,
+            });
+        }
     }
 
     // Generate verification token
@@ -88,30 +107,42 @@ const registerUser = async (req, res) => {
 // @access  Public
 const verifyEmail = async (req, res) => {
     const { token } = req.params;
+    console.log('--- Verification Attempt ---');
+    console.log('Token from URL:', token);
 
-    const user = await User.findOne({
-        emailVerificationToken: token,
-        emailVerificationExpires: { $gt: Date.now() },
-    });
+    // First, find the user by token alone to see if the token exists
+    const userByToken = await User.findOne({ emailVerificationToken: token });
 
-    if (!user) {
-        return res.status(400).json({ message: 'Invalid or expired verification token' });
+    if (!userByToken) {
+        console.log('❌ Token Not Found in DB');
+        return res.status(400).json({ message: 'Invalid or expired verification token (Token not found)' });
     }
 
-    user.isEmailVerified = true;
-    user.emailVerificationToken = undefined;
-    user.emailVerificationExpires = undefined;
-    await user.save();
+    console.log('✅ Token Found for User:', userByToken.email);
+    console.log('Token Expiration in DB:', userByToken.emailVerificationExpires);
+    console.log('Current Time:', new Date());
+
+    if (userByToken.emailVerificationExpires < new Date()) {
+        console.log('❌ Token Expired');
+        return res.status(400).json({ message: 'Invalid or expired verification token (Token expired)' });
+    }
+
+    userByToken.isEmailVerified = true;
+    userByToken.emailVerificationToken = undefined;
+    userByToken.emailVerificationExpires = undefined;
+    await userByToken.save();
+
+    console.log('✅ Email Verified Successfully for:', userByToken.email);
 
     res.json({
         message: 'Email verified successfully! You can now log in.',
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        isAdmin: user.isAdmin,
-        isEmailVerified: user.isEmailVerified,
-        token: generateToken(user._id),
+        _id: userByToken._id,
+        name: userByToken.name,
+        email: userByToken.email,
+        phone: userByToken.phone,
+        isAdmin: userByToken.isAdmin,
+        isEmailVerified: userByToken.isEmailVerified,
+        token: generateToken(userByToken._id),
     });
 };
 

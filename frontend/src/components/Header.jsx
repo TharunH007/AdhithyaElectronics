@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
 import useCartStore from '../store/cartStore';
-import { ShoppingCart, User, LogOut, Zap } from 'lucide-react';
+import { ShoppingCart, User, LogOut, Home } from 'lucide-react';
 import SearchBox from './SearchBox';
 
 const Header = () => {
@@ -24,12 +24,12 @@ const Header = () => {
                 <div className="flex justify-between h-16 items-center">
                     <div className="flex-shrink-0">
                         <Link to="/" className="flex items-center gap-2 text-2xl font-black tracking-tight text-gray-900 group">
-                            <div className="bg-yellow-500 p-1.5 rounded-lg group-hover:bg-yellow-600 transition-colors shadow-sm">
-                                <Zap className="h-6 w-6 text-white fill-white" />
+                            <div className="bg-indigo-600 p-1.5 rounded-lg group-hover:bg-indigo-700 transition-colors shadow-sm">
+                                <Home className="h-6 w-6 text-white fill-white" />
                             </div>
                             <span className="flex items-center">
-                                <span className="text-gray-900">Adhithya</span>
-                                <span className="ml-1 text-indigo-600">Electronics</span>
+                                <span className="text-gray-900">Bombay</span>
+                                <span className="ml-1 text-indigo-600">Dyeing - NKM Trading</span>
                             </span>
                         </Link>
                     </div>

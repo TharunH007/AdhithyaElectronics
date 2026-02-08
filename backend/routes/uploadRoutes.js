@@ -35,7 +35,7 @@ router.post('/', upload.single('image'), async (req, res) => {
         const uploadPromise = new Promise((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(
                 {
-                    folder: 'adhithya-electronics',
+                    folder: 'bombay-dyeing-nkm',
                     transformation: [
                         { width: 1000, height: 1000, crop: 'limit' },
                         { quality: 'auto' },

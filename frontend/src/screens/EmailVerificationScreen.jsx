@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../utils/api';
 import useAuthStore from '../store/authStore';
@@ -11,8 +11,13 @@ const EmailVerificationScreen = () => {
     const [status, setStatus] = useState('verifying'); // verifying, success, error
     const [message, setMessage] = useState('');
 
+    const calledRequest = useRef(false);
+
     useEffect(() => {
         const verifyEmail = async () => {
+            if (calledRequest.current) return;
+            calledRequest.current = true;
+
             try {
                 const { data } = await api.get(`/api/users/verify-email/${token}`);
                 setStatus('success');

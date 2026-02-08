@@ -1,6 +1,6 @@
 # Railway Deployment Guide
 
-This guide will help you deploy the Adhithya Electronics application on Railway.
+This guide will help you deploy the Bombay Dyeing - NKM Trading Company application on Railway.
 
 ## Prerequisites
 
@@ -37,7 +37,7 @@ CLOUDINARY_API_SECRET=your-api-secret
 EMAIL_SERVICE=gmail
 EMAIL_USER=your-email@gmail.com
 EMAIL_PASSWORD=your-app-password
-EMAIL_FROM=Adhithya Electronics <noreply@adhithyaelectronics.com>
+EMAIL_FROM=Bombay Dyeing - NKM Trading Company <noreply@adhithyaelectronics.com>
 FRONTEND_URL=https://your-railway-domain.up.railway.app
 RAZORPAY_KEY_ID=your-key-id
 RAZORPAY_KEY_SECRET=your-key-secret

@@ -23,7 +23,7 @@ const sendVerificationEmail = async (user, token) => {
     const mailOptions = {
         from: process.env.EMAIL_FROM,
         to: user.email,
-        subject: 'Verify Your Email - Adhithya Electronics',
+        subject: 'Verify Your Email - Bombay Dyeing - NKM Trading Company',
         html: `
             <!DOCTYPE html>
             <html>
@@ -40,11 +40,11 @@ const sendVerificationEmail = async (user, token) => {
             <body>
                 <div class="container">
                     <div class="header">
-                        <h1>Welcome to Adhithya Electronics!</h1>
+                        <h1>Welcome to Bombay Dyeing - NKM Trading Company!</h1>
                     </div>
                     <div class="content">
                         <h2>Hi ${user.name},</h2>
-                        <p>Thank you for registering with Adhithya Electronics. Please verify your email address to activate your account.</p>
+                        <p>Thank you for registering with Bombay Dyeing - NKM Trading Company. Please verify your email address to activate your account.</p>
                         <p>Click the button below to verify your email:</p>
                         <a href="${verificationUrl}" class="button">Verify Email</a>
                         <p>Or copy and paste this link in your browser:</p>
@@ -53,7 +53,7 @@ const sendVerificationEmail = async (user, token) => {
                         <p>If you didn't create an account, please ignore this email.</p>
                     </div>
                     <div class="footer">
-                        <p>&copy; 2026 Adhithya Electronics. All rights reserved.</p>
+                        <p>&copy; 2026 Bombay Dyeing - NKM Trading Company. All rights reserved.</p>
                     </div>
                 </div>
             </body>
@@ -83,7 +83,7 @@ const sendPasswordResetEmail = async (user, token) => {
     const mailOptions = {
         from: process.env.EMAIL_FROM,
         to: user.email,
-        subject: 'Password Reset Request - Adhithya Electronics',
+        subject: 'Password Reset Request - Bombay Dyeing - NKM Trading Company',
         html: `
             <!DOCTYPE html>
             <html>
@@ -105,7 +105,7 @@ const sendPasswordResetEmail = async (user, token) => {
                     </div>
                     <div class="content">
                         <h2>Hi ${user.name},</h2>
-                        <p>We received a request to reset your password for your Adhithya Electronics account.</p>
+                        <p>We received a request to reset your password for your Bombay Dyeing - NKM Trading Company account.</p>
                         <p>Click the button below to reset your password:</p>
                         <a href="${resetUrl}" class="button">Reset Password</a>
                         <p>Or copy and paste this link in your browser:</p>
@@ -116,7 +116,7 @@ const sendPasswordResetEmail = async (user, token) => {
                         </div>
                     </div>
                     <div class="footer">
-                        <p>&copy; 2026 Adhithya Electronics. All rights reserved.</p>
+                        <p>&copy; 2026 Bombay Dyeing - NKM Trading Company. All rights reserved.</p>
                     </div>
                 </div>
             </body>
@@ -156,7 +156,7 @@ const sendOrderConfirmationEmail = async (order, user) => {
     const mailOptions = {
         from: process.env.EMAIL_FROM,
         to: user.email,
-        subject: `Order Confirmation #${order._id} - Adhithya Electronics`,
+        subject: `Order Confirmation #${order._id} - Bombay Dyeing - NKM Trading Company`,
         html: `
             <!DOCTYPE html>
             <html>
@@ -221,7 +221,7 @@ const sendOrderConfirmationEmail = async (order, user) => {
                         <p>We'll send you another email when your order ships.</p>
                     </div>
                     <div class="footer">
-                        <p>&copy; 2026 Adhithya Electronics. All rights reserved.</p>
+                        <p>&copy; 2026 Bombay Dyeing - NKM Trading Company. All rights reserved.</p>
                     </div>
                 </div>
             </body>

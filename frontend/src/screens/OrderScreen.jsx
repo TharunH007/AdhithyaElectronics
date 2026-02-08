@@ -13,6 +13,10 @@ const OrderScreen = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [loadingDeliver, setLoadingDeliver] = useState(false);
+    const [loadingReturn, setLoadingReturn] = useState(false);
+    const [showReturnModal, setShowReturnModal] = useState(false);
+    const [returnReason, setReturnReason] = useState('');
+    const [returnType, setReturnType] = useState('Return'); // 'Return' or 'Replace'
 
     const fetchOrder = async () => {
         try {
@@ -39,6 +43,38 @@ const OrderScreen = () => {
             alert(err.response?.data?.message || err.message);
             setLoadingDeliver(false);
         }
+    };
+
+    const returnHandler = async () => {
+        if (!returnReason) {
+            alert('Please provide a reason for return/replacement');
+            return;
+        }
+
+        setLoadingReturn(true);
+        try {
+            await api.put(`/api/orders/${id}/return`, {
+                reason: returnReason,
+                type: returnType
+            });
+            await fetchOrder();
+            setLoadingReturn(false);
+            setShowReturnModal(false);
+        } catch (err) {
+            alert(err.response?.data?.message || err.message);
+            setLoadingReturn(false);
+        }
+    };
+
+    const canReturn = () => {
+        if (!order || !order.isDelivered || order.returnRequest?.isReturned) return false;
+
+        const deliveredAt = new Date(order.deliveredAt);
+        const now = new Date();
+        const diffTime = Math.abs(now - deliveredAt);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        return diffDays <= 7;
     };
 
     if (loading) return <Loader />;
@@ -176,10 +212,86 @@ const OrderScreen = () => {
                                     </button>
                                 </div>
                             )}
+
+                            {canReturn() && (
+                                <div className="pt-6">
+                                    <button
+                                        onClick={() => setShowReturnModal(true)}
+                                        className="w-full bg-amber-500 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-amber-600 transition-all shadow-lg shadow-amber-100 active:scale-[0.98]"
+                                    >
+                                        <Truck size={20} />
+                                        Return / Replace Order
+                                    </button>
+                                </div>
+                            )}
+
+                            {order.returnRequest?.isReturned && (
+                                <div className="mt-6 bg-amber-50 border border-amber-200 p-4 rounded-xl">
+                                    <p className="text-amber-800 font-bold text-sm">
+                                        {order.returnRequest.type} Requested
+                                    </p>
+                                    <p className="text-amber-600 text-xs mt-1">
+                                        Status: {order.returnRequest.status}
+                                    </p>
+                                    <p className="text-gray-500 text-xs mt-2 italic">
+                                        "{order.returnRequest.reason}"
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* Return Modal */}
+            {showReturnModal && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl scale-in-center">
+                        <h2 className="text-2xl font-black text-gray-900 mb-6">Request Return / Replacement</h2>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Request Type</label>
+                                <div className="flex gap-4">
+                                    {['Return', 'Replace'].map((t) => (
+                                        <button
+                                            key={t}
+                                            onClick={() => setReturnType(t)}
+                                            className={`flex-1 py-3 rounded-xl font-bold transition-all ${returnType === t ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'bg-gray-50 text-gray-500 hover:bg-gray-100'}`}
+                                        >
+                                            {t}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Reason</label>
+                                <textarea
+                                    value={returnReason}
+                                    onChange={(e) => setReturnReason(e.target.value)}
+                                    placeholder="Tell us why you want to return or replace this order..."
+                                    className="w-full bg-gray-50 border-0 rounded-2xl p-4 text-sm focus:ring-2 focus:ring-indigo-500 transition-all"
+                                    rows="4"
+                                />
+                            </div>
+                        </div>
+                        <div className="flex gap-3 mt-8">
+                            <button
+                                onClick={() => setShowReturnModal(false)}
+                                className="flex-1 py-4 font-bold text-gray-500 hover:bg-gray-50 rounded-xl transition-all"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={returnHandler}
+                                disabled={loadingReturn}
+                                className="flex-1 py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 disabled:opacity-50"
+                            >
+                                {loadingReturn ? <Loader size="sm" /> : 'Submit Request'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

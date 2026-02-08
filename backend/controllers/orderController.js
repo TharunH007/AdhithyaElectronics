@@ -21,6 +21,11 @@ const addOrderItems = async (req, res) => {
         res.status(400);
         throw new Error('No order items');
     } else {
+        // Recalculate shippingPrice on server for security
+        // Inclusive of tax as per user request (totalPrice before shipping)
+        const itemsAndTax = Number(itemsPrice) + Number(taxPrice);
+        const calculatedShippingPrice = itemsAndTax > 1000 ? 0 : 50;
+
         const order = new Order({
             orderItems,
             user: req.user._id,
@@ -28,8 +33,8 @@ const addOrderItems = async (req, res) => {
             paymentMethod,
             itemsPrice,
             taxPrice,
-            shippingPrice,
-            totalPrice,
+            shippingPrice: calculatedShippingPrice,
+            totalPrice: itemsAndTax + calculatedShippingPrice,
         });
 
         const createdOrder = await order.save();
@@ -126,11 +131,50 @@ const updateOrderToDelivered = async (req, res) => {
     }
 };
 
+// @desc    Update order to returned/replaced
+// @route   PUT /api/orders/:id/return
+// @access  Private
+const createReturnRequest = async (req, res) => {
+    const { reason, type } = req.body;
+    const order = await Order.findById(req.params.id);
+
+    if (order) {
+        if (!order.isDelivered) {
+            res.status(400).json({ message: 'Order must be delivered to request return' });
+            return;
+        }
+
+        const deliveredAt = new Date(order.deliveredAt);
+        const now = new Date();
+        const diffTime = Math.abs(now - deliveredAt);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays > 7) {
+            res.status(400).json({ message: 'Return window (7 days) has expired' });
+            return;
+        }
+
+        order.returnRequest = {
+            isReturned: true,
+            returnedAt: Date.now(),
+            reason,
+            status: 'Requested',
+            type,
+        };
+
+        const updatedOrder = await order.save();
+        res.json(updatedOrder);
+    } else {
+        res.status(404).json({ message: 'Order not found' });
+    }
+};
+
 module.exports = {
     addOrderItems,
     getOrderById,
     updateOrderToPaid,
     updateOrderToDelivered,
+    createReturnRequest,
     getMyOrders,
     getOrders,
 };

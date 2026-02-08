@@ -36,6 +36,13 @@ const orderSchema = mongoose.Schema({
     isDelivered: { type: Boolean, required: true, default: false },
     deliveredAt: { type: Date },
     status: { type: String, default: 'Pending' }, // Pending, Processing, Shipped, Delivered, Cancelled
+    returnRequest: {
+        isReturned: { type: Boolean, default: false },
+        returnedAt: { type: Date },
+        reason: { type: String },
+        status: { type: String }, // Requested, Approved, Rejected, Refunded, Replaced
+        type: { type: String }, // Return, Replace
+    },
 }, {
     timestamps: true,
 });

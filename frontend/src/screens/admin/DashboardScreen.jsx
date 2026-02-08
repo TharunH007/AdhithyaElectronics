@@ -176,7 +176,7 @@ const DashboardScreen = () => {
 
             {/* Footer */}
             <div className="text-center py-4 text-gray-500 text-sm border-t">
-                © 2026 Adhithya Electronics. All rights reserved.
+                © 2026 Bombay Dyeing - NKM Trading Company. All rights reserved.
             </div>
         </div>
     );

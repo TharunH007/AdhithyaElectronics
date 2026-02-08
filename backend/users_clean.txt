@@ -1,0 +1,19 @@
+USERS LIST:
+Email: admin@example.com
+Verified: true
+Password (raw): $2b$10$W9jCmLsED8R6GkUc2AdIY.02pgqpyT4.43WpRimOiqMlh5m4DdEdG
+Token: undefined
+Expires: undefined
+--------------------
+Email: john@example.com
+Verified: true
+Password (raw): $2b$10$49NjJHf/P8DQcx41rerAeukJdQLefmmdtqAjdpc9cp/Qp7gBHbIhm
+Token: undefined
+Expires: undefined
+--------------------
+Email: jane@example.com
+Verified: true
+Password (raw): $2b$10$nfaJOQmt3NhAefCzhBrecuEErkESxahQqQfLgMNt9t7OdwGQpnr1S
+Token: undefined
+Expires: undefined
+--------------------

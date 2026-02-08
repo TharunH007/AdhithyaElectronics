@@ -61,7 +61,7 @@ const createProduct = async (req, res) => {
         name: 'Sample name',
         price: 0,
         user: req.user._id,
-        image: 'https://images.unsplash.com/photo-1526733169359-ab1152917dae?auto=format&fit=crop&w=800&q=80', // Electronics placeholder
+        image: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=800&q=80', // Textile placeholder
         brand: 'Sample brand',
         category: 'Sample category',
         countInStock: 0,

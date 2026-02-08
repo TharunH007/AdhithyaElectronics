@@ -44,10 +44,10 @@ const HomeScreen = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-900 to-transparent z-10"></div>
                 <div className="relative z-20 px-8 py-16 md:py-24 max-w-2xl">
                     <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight">
-                        Next-Gen Electronics for <span className="text-indigo-400">Your Modern Life.</span>
+                        Premium Home Textiles for <span className="text-indigo-400">Your Modern Home.</span>
                     </h1>
                     <p className="mt-6 text-lg text-indigo-100 max-w-lg">
-                        Discover the latest in premium tech, from high-performance laptops to immersive audio gear. Quality guaranteed.
+                        Discover the finest collection of bed linen, towels, and home decor from Bombay Dyeing. Quality and comfort guaranteed.
                     </p>
                     <div className="mt-10 flex gap-4">
                         <button className="bg-white text-indigo-900 px-8 py-3 rounded-full font-bold hover:bg-indigo-50 transition shadow-lg">

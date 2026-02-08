@@ -1,4 +1,4 @@
-# Aditya Electronics - Usage & Deployment Guide
+# Bombay Dyeing - NKM Trading Company - Usage & Deployment Guide
 
 ## 1. Environment Setup
 
@@ -58,7 +58,7 @@ This project uses a **Monolithic Deployment** strategy. The React frontend is bu
    This creates a `dist` folder in `frontend/`.
 
 2. **Deploy Backend**:
-   - Upload the entire `aditya-electronics` folder to your server (e.g., DigitalOcean, Heroku, Render, AWS EC2).
+   - Upload the entire `bombay-dyeing-nkm` folder to your server (e.g., DigitalOcean, Heroku, Render, AWS EC2).
    - Ensure `backend/` and `frontend/dist/` are present.
    - Install backend dependencies: `cd backend && npm install --production`.
 

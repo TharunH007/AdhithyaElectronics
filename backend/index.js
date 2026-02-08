@@ -28,7 +28,7 @@ if (process.env.NODE_ENV === 'production') {
     );
 } else {
     app.get('/', (req, res) => {
-        res.send('Adhithya Electronics API is running...');
+        res.send('Bombay Dyeing - NKM Trading Company API is running...');
     });
 }
 

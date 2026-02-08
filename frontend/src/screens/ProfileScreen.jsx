@@ -383,7 +383,7 @@ const ProfileScreen = () => {
                                     {activeTab.replace(/([A-Z])/g, ' $1')}
                                 </h1>
                                 <p>This information is currently being updated. Please check back later for full details regarding our policies and company information.</p>
-                                <p>For urgent inquiries, please contact our support team at support@adhithyaelectronics.com.</p>
+                                <p>For urgent inquiries, please contact our support team at support@nkmtrading.com.</p>
                             </div>
                         )}
                     </div>

@@ -11,11 +11,11 @@ const Cart = require('./models/Cart');
 dotenv.config();
 
 const categories = [
-    { name: 'Laptops', slug: 'laptops' },
-    { name: 'Smartphones', slug: 'smartphones' },
-    { name: 'Audio', slug: 'audio' },
-    { name: 'Cameras', slug: 'cameras' },
-    { name: 'Accessories', slug: 'accessories' },
+    { name: 'Bed Linen', slug: 'bed-linen' },
+    { name: 'Towels', slug: 'towels' },
+    { name: 'Pillows', slug: 'pillows' },
+    { name: 'Blankets', slug: 'blankets' },
+    { name: 'Home Decor', slug: 'home-decor' },
 ];
 
 const importData = async () => {
@@ -28,7 +28,11 @@ const importData = async () => {
         await Category.deleteMany();
         await Cart.deleteMany();
 
-        const createdUsers = await User.insertMany(users);
+        const createdUsers = [];
+        for (const user of users) {
+            const newUser = await User.create(user);
+            createdUsers.push(newUser);
+        }
         const adminUser = createdUsers[0]._id;
 
         await Category.insertMany(categories);

@@ -1,0 +1,21 @@
+﻿[dotenv@17.2.3] injecting env (14) from .env -- tip: ΓÜÖ∩╕Å  suppress all logs with { quiet: true }
+Starting Cloudinary uploads...
+Uploading bed_linen...
+Γ£à bed_linen: https://res.cloudinary.com/dohxmgc10/image/upload/v1769978322/bombay-dyeing-seed/bed_linen.jpg
+Uploading towels...
+Γ£à towels: https://res.cloudinary.com/dohxmgc10/image/upload/v1769978323/bombay-dyeing-seed/towels.jpg
+Uploading pillows...
+Γ£à pillows: https://res.cloudinary.com/dohxmgc10/image/upload/v1769978324/bombay-dyeing-seed/pillows.jpg
+Uploading blankets...
+Γ£à blankets: https://res.cloudinary.com/dohxmgc10/image/upload/v1769978326/bombay-dyeing-seed/blankets.jpg
+Uploading home_decor...
+Γ£à home_decor: https://res.cloudinary.com/dohxmgc10/image/upload/v1769978327/bombay-dyeing-seed/home_decor.jpg
+
+--- Final Cloudinary URLs ---
+{
+  "bed_linen": "https://res.cloudinary.com/dohxmgc10/image/upload/v1769978322/bombay-dyeing-seed/bed_linen.jpg",
+  "towels": "https://res.cloudinary.com/dohxmgc10/image/upload/v1769978323/bombay-dyeing-seed/towels.jpg",
+  "pillows": "https://res.cloudinary.com/dohxmgc10/image/upload/v1769978324/bombay-dyeing-seed/pillows.jpg",
+  "blankets": "https://res.cloudinary.com/dohxmgc10/image/upload/v1769978326/bombay-dyeing-seed/blankets.jpg",
+  "home_decor": "https://res.cloudinary.com/dohxmgc10/image/upload/v1769978327/bombay-dyeing-seed/home_decor.jpg"
+}
