@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
 import useCartStore from '../store/cartStore';
+import api from '../utils/api';
 import { ShoppingCart, User, LogOut, Home } from 'lucide-react';
 import SearchBox from './SearchBox';
 
@@ -16,6 +17,7 @@ const Header = () => {
         }
         clearCart();
         logout();
+        window.location.reload();
     };
 
     return (

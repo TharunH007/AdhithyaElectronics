@@ -66,14 +66,16 @@ const ProductEditScreen = () => {
         try {
             await api.put(`/api/products/${productId}`, {
                 name,
+                price: Number(price),
                 image,
                 brand,
                 category,
                 description,
-                countInStock,
-                mrp,
-                discountPercent,
-                taxPercent,
+                countInStock: Number(countInStock),
+                mrp: Number(mrp),
+                discountPercent: Number(discountPercent),
+                taxPercent: Number(taxPercent),
+                shippingPrice: Number(shippingPrice),
             });
             setLoadingUpdate(false);
             navigate('/admin/productlist');
@@ -97,7 +99,7 @@ const ProductEditScreen = () => {
             };
 
             const { data } = await api.post('/api/upload', formData, config);
-            setImage(data);
+            setImage(data.url);
             setUploading(false);
         } catch (error) {
             console.error(error);
