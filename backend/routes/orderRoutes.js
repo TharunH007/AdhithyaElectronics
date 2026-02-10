@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {
     addOrderItems,
+    calculateOrderShippingRates,
     getOrderById,
     updateOrderToPaid,
     updateOrderToDelivered,
@@ -12,6 +13,7 @@ const {
 const { protect, admin } = require('../middleware/authMiddleware');
 
 router.route('/').post(protect, addOrderItems).get(protect, admin, getOrders);
+router.route('/rates').post(protect, calculateOrderShippingRates);
 router.route('/myorders').get(protect, getMyOrders);
 router.route('/:id').get(protect, getOrderById);
 router.route('/:id/pay').put(protect, updateOrderToPaid);

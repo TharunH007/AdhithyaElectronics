@@ -21,6 +21,11 @@ import CustomerListScreen from './screens/admin/CustomerListScreen';
 import CustomerDetailScreen from './screens/admin/CustomerDetailScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import SearchScreen from './screens/SearchScreen';
+import AboutScreen from './screens/AboutScreen';
+import FAQScreen from './screens/FAQScreen';
+import TermsScreen from './screens/TermsScreen';
+import ReturnPolicyScreen from './screens/ReturnPolicyScreen';
+import ReturnListScreen from './screens/admin/ReturnListScreen';
 
 function App() {
   return (
@@ -30,6 +35,10 @@ function App() {
         <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Routes>
             <Route path="/" element={<HomeScreen />} />
+            <Route path="/about" element={<AboutScreen />} />
+            <Route path="/faq" element={<FAQScreen />} />
+            <Route path="/terms" element={<TermsScreen />} />
+            <Route path="/return-policy" element={<ReturnPolicyScreen />} />
             <Route path="/search/:keyword" element={<SearchScreen />} />
             <Route path="/category/:category" element={<SearchScreen />} />
             <Route path="/category/:category/search/:keyword" element={<SearchScreen />} />
@@ -52,6 +61,7 @@ function App() {
               <Route path="productlist" element={<ProductListScreen />} />
               <Route path="product/:id/edit" element={<ProductEditScreen />} />
               <Route path="orderlist" element={<OrderListScreen />} />
+              <Route path="returns" element={<ReturnListScreen />} />
               <Route path="customers" element={<CustomerListScreen />} />
               <Route path="customers/:id" element={<CustomerDetailScreen />} />
             </Route>

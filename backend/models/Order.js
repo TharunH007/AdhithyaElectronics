@@ -20,6 +20,7 @@ const orderSchema = mongoose.Schema({
         city: { type: String, required: true },
         postalCode: { type: String, required: true },
         country: { type: String, required: true },
+        phone: { type: String },
     },
     paymentMethod: { type: String, required: true },
     paymentResult: {
@@ -42,6 +43,15 @@ const orderSchema = mongoose.Schema({
         reason: { type: String },
         status: { type: String }, // Requested, Approved, Rejected, Refunded, Replaced
         type: { type: String }, // Return, Replace
+    },
+    shiprocket: {
+        shipmentId: { type: String },
+        orderId: { type: String },
+        awbCode: { type: String },
+        trackingLink: { type: String },
+        courierName: { type: String },
+        shipmentStatus: { type: String },
+        lastUpdated: { type: Date },
     },
 }, {
     timestamps: true,

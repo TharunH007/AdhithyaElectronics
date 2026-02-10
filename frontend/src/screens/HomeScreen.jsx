@@ -50,10 +50,16 @@ const HomeScreen = () => {
                         Discover the finest collection of bed linen, towels, and home decor from Bombay Dyeing. Quality and comfort guaranteed.
                     </p>
                     <div className="mt-10 flex gap-4">
-                        <button className="bg-white text-indigo-900 px-8 py-3 rounded-full font-bold hover:bg-indigo-50 transition shadow-lg">
+                        <button
+                            onClick={() => document.getElementById('latest-products')?.scrollIntoView({ behavior: 'smooth' })}
+                            className="bg-white text-indigo-900 px-8 py-3 rounded-full font-bold hover:bg-indigo-50 transition shadow-lg"
+                        >
                             Shop Now
                         </button>
-                        <button className="border-2 border-white/30 text-white px-8 py-3 rounded-full font-bold hover:bg-white/10 transition backdrop-blur-sm">
+                        <button
+                            onClick={() => navigate('/about')}
+                            className="border-2 border-white/30 text-white px-8 py-3 rounded-full font-bold hover:bg-white/10 transition backdrop-blur-sm"
+                        >
                             Learn More
                         </button>
                     </div>
@@ -80,7 +86,7 @@ const HomeScreen = () => {
                 <div className="flex flex-col items-center text-center gap-2">
                     <ShoppingBag className="h-8 w-8 text-indigo-600" />
                     <span className="font-bold text-gray-900">Premium Quality</span>
-                    <span className="text-xs text-gray-500">Curated Tech Brands</span>
+                    <span className="text-xs text-gray-500">Authentic Fabrics</span>
                 </div>
                 <div className="flex flex-col items-center text-center gap-2">
                     <Headphones className="h-8 w-8 text-indigo-600" />
@@ -90,7 +96,7 @@ const HomeScreen = () => {
             </div>
 
             {/* Products Section */}
-            <div>
+            <div id="latest-products">
                 <div className="flex justify-between items-end mb-8">
                     <div>
                         <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Latest Products</h2>

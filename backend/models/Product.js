@@ -26,6 +26,10 @@ const productSchema = mongoose.Schema({
     taxPercent: { type: Number, required: true, default: 0 },
     shippingPrice: { type: Number, required: true, default: 0 },
     countInStock: { type: Number, required: true, default: 0 },
+    weight: { type: Number, default: 0.5 }, // in kg
+    length: { type: Number, default: 10 }, // in cm
+    width: { type: Number, default: 10 }, // in cm
+    height: { type: Number, default: 10 }, // in cm
     specs: { type: Map, of: String }, // e.g. { "RAM": "8GB", "Storage": "256GB" }
 }, {
     timestamps: true,

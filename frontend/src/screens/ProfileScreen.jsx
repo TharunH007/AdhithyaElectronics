@@ -111,14 +111,9 @@ const ProfileScreen = () => {
     const menuItems = [
         { id: 'profile', label: 'My Profile', icon: <User size={20} />, color: 'text-amber-600' },
         ...(!userInfo?.isAdmin ? [
-            { id: 'orders', label: 'Online Order History', icon: <ShoppingBag size={20} />, color: 'text-amber-700' },
-            { id: 'address', label: 'Online Saved Address', icon: <MapPin size={20} />, color: 'text-amber-800' },
+            { id: 'orders', label: 'My Orders', icon: <ShoppingBag size={20} />, color: 'text-amber-700' },
+            { id: 'address', label: 'Saved Addresses', icon: <MapPin size={20} />, color: 'text-amber-800' },
         ] : []),
-        { id: 'about', label: 'About Us', icon: <Info size={20} />, color: 'text-amber-600' },
-        { id: 'faq', label: 'FAQ\'s', icon: <HelpCircle size={20} />, color: 'text-amber-600' },
-        { id: 'terms', label: 'Terms and Conditions', icon: <FileText size={20} />, color: 'text-amber-700' },
-        { id: 'privacy', label: 'Privacy Policy', icon: <ShieldCheck size={20} />, color: 'text-amber-800' },
-        { id: 'cancellation', label: 'Cancellation Policy', icon: <XCircle size={20} />, color: 'text-red-500' },
         { id: 'logout', label: 'Logout', icon: <LogOut size={20} />, color: 'text-gray-600', action: logout },
     ];
 
@@ -374,16 +369,6 @@ const ProfileScreen = () => {
                                         )}
                                     </div>
                                 )}
-                            </div>
-                        )}
-
-                        {['about', 'faq', 'terms', 'privacy', 'cancellation'].includes(activeTab) && (
-                            <div className="prose max-w-none text-gray-600">
-                                <h1 className="text-2xl font-bold text-gray-800 mb-6 capitalize">
-                                    {activeTab.replace(/([A-Z])/g, ' $1')}
-                                </h1>
-                                <p>This information is currently being updated. Please check back later for full details regarding our policies and company information.</p>
-                                <p>For urgent inquiries, please contact our support team at support@nkmtrading.com.</p>
                             </div>
                         )}
                     </div>

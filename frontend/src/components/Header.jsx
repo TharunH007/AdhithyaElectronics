@@ -88,6 +88,12 @@ const Header = () => {
                                                     Orders
                                                 </Link>
                                                 <Link
+                                                    to="/admin/returns"
+                                                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                >
+                                                    Returns
+                                                </Link>
+                                                <Link
                                                     to="/admin/customers"
                                                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                                 >

@@ -53,7 +53,8 @@ const OrderScreen = () => {
 
         setLoadingReturn(true);
         try {
-            await api.put(`/api/orders/${id}/return`, {
+            await api.post(`/api/returns`, {
+                orderId: id,
                 reason: returnReason,
                 type: returnType
             });
@@ -67,14 +68,7 @@ const OrderScreen = () => {
     };
 
     const canReturn = () => {
-        if (!order || !order.isDelivered || order.returnRequest?.isReturned) return false;
-
-        const deliveredAt = new Date(order.deliveredAt);
-        const now = new Date();
-        const diffTime = Math.abs(now - deliveredAt);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-        return diffDays <= 7;
+        return order && order.isDelivered && !order.returnRequest?.isReturned;
     };
 
     if (loading) return <Loader />;
