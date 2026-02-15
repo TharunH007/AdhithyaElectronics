@@ -8,13 +8,43 @@ const PlaceOrderScreen = () => {
     const navigate = useNavigate();
     const { cartItems, shippingAddress, clearCart } = useCartStore();
     const { userInfo } = useAuthStore();
+    const [shippingPrice, setShippingPrice] = useState(0);
+    const [loadingShipping, setLoadingShipping] = useState(false);
     const [error, setError] = useState(null);
 
-    // Calculate prices
+    // Calculate base prices
     const itemsPrice = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
     const taxPrice = Number((0.18 * itemsPrice).toFixed(2));
-    const shippingPrice = (itemsPrice + taxPrice) > 1000 ? 0 : 50;
     const totalPrice = itemsPrice + shippingPrice + taxPrice;
+
+    useEffect(() => {
+        const fetchShippingRates = async () => {
+            if (cartItems.length === 0 || !shippingAddress.postalCode) return;
+
+            console.log('Fetching shipping rates for:', shippingAddress);
+            setLoadingShipping(true);
+            try {
+                const { data } = await api.post('/api/orders/rates', {
+                    orderItems: cartItems,
+                    shippingAddress
+                });
+                console.log('Shipping rate response:', data);
+
+                if (data && typeof data.rate === 'number') {
+                    setShippingPrice(data.rate);
+                } else {
+                    setShippingPrice(50);
+                }
+            } catch (err) {
+                console.error('Error fetching shipping rates:', err);
+                setShippingPrice(50); // Fallback
+            } finally {
+                setLoadingShipping(false);
+            }
+        };
+
+        fetchShippingRates();
+    }, [cartItems, shippingAddress]);
 
     useEffect(() => {
         if (!shippingAddress.address) {
@@ -116,7 +146,8 @@ const PlaceOrderScreen = () => {
                     <h2 className="text-xl font-bold mb-2">Shipping</h2>
                     <p className="text-gray-700">
                         {shippingAddress.address}, {shippingAddress.city},{' '}
-                        {shippingAddress.postalCode}, {shippingAddress.country}
+                        {shippingAddress.state}, {shippingAddress.postalCode},{' '}
+                        {shippingAddress.country}
                     </p>
                 </div>
 
@@ -152,7 +183,7 @@ const PlaceOrderScreen = () => {
                         </div>
                         <div className="flex justify-between">
                             <span>Shipping</span>
-                            <span>₹{shippingPrice.toFixed(2)}</span>
+                            <span>{loadingShipping ? 'Calculating...' : `₹${shippingPrice.toFixed(2)}`}</span>
                         </div>
                         <div className="flex justify-between">
                             <span>Tax</span>

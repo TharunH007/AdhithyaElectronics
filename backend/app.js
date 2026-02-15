@@ -41,7 +41,6 @@ const cartRoutes = require('./routes/cartRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const returnRoutes = require('./routes/returnRoutes');
-const shiprocketRoutes = require('./routes/shiprocketRoutes');
 
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
@@ -53,7 +52,6 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/shiprocket', shiprocketRoutes);
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {

@@ -19,7 +19,7 @@ const ProfileScreen = () => {
     const [loading, setLoading] = useState(false);
     const [addresses, setAddresses] = useState([]);
     const [loadingAddresses, setLoadingAddresses] = useState(false);
-    const [addressForm, setAddressForm] = useState({ name: '', address: '', city: '', postalCode: '', country: 'India' });
+    const [addressForm, setAddressForm] = useState({ name: '', address: '', city: '', state: '', postalCode: '', phone: '', country: 'India' });
     const [showAddressForm, setShowAddressForm] = useState(false);
     const [orders, setOrders] = useState([]);
     const [loadingOrders, setLoadingOrders] = useState(false);
@@ -65,7 +65,7 @@ const ProfileScreen = () => {
         e.preventDefault();
         try {
             await api.post('/api/addresses', addressForm);
-            setAddressForm({ name: '', address: '', city: '', postalCode: '', country: 'India' });
+            setAddressForm({ name: '', address: '', city: '', state: '', postalCode: '', phone: '', country: 'India' });
             setShowAddressForm(false);
             fetchAddresses();
         } catch (err) {
@@ -324,7 +324,54 @@ const ProfileScreen = () => {
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Postal Code (Chennai only)</label>
+                                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">State</label>
+                                                <select
+                                                    required
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                                    value={addressForm.state}
+                                                    onChange={(e) => setAddressForm({ ...addressForm, state: e.target.value })}
+                                                >
+                                                    <option value="">Select State</option>
+                                                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                                    <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                                    <option value="Assam">Assam</option>
+                                                    <option value="Bihar">Bihar</option>
+                                                    <option value="Chhattisgarh">Chhattisgarh</option>
+                                                    <option value="Goa">Goa</option>
+                                                    <option value="Gujarat">Gujarat</option>
+                                                    <option value="Haryana">Haryana</option>
+                                                    <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                                    <option value="Jharkhand">Jharkhand</option>
+                                                    <option value="Karnataka">Karnataka</option>
+                                                    <option value="Kerala">Kerala</option>
+                                                    <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                                    <option value="Maharashtra">Maharashtra</option>
+                                                    <option value="Manipur">Manipur</option>
+                                                    <option value="Meghalaya">Meghalaya</option>
+                                                    <option value="Mizoram">Mizoram</option>
+                                                    <option value="Nagaland">Nagaland</option>
+                                                    <option value="Odisha">Odisha</option>
+                                                    <option value="Punjab">Punjab</option>
+                                                    <option value="Rajasthan">Rajasthan</option>
+                                                    <option value="Sikkim">Sikkim</option>
+                                                    <option value="Tamil Nadu">Tamil Nadu</option>
+                                                    <option value="Telangana">Telangana</option>
+                                                    <option value="Tripura">Tripura</option>
+                                                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                                    <option value="Uttarakhand">Uttarakhand</option>
+                                                    <option value="West Bengal">West Bengal</option>
+                                                    <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                                                    <option value="Chandigarh">Chandigarh</option>
+                                                    <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
+                                                    <option value="Delhi">Delhi</option>
+                                                    <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                                                    <option value="Ladakh">Ladakh</option>
+                                                    <option value="Lakshadweep">Lakshadweep</option>
+                                                    <option value="Puducherry">Puducherry</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Postal Code</label>
                                                 <input
                                                     type="text"
                                                     required
@@ -333,10 +380,20 @@ const ProfileScreen = () => {
                                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                                                 />
                                             </div>
+                                            <div>
+                                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Mobile Number</label>
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    value={addressForm.phone}
+                                                    onChange={(e) => setAddressForm({ ...addressForm, phone: e.target.value })}
+                                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                                />
+                                            </div>
                                         </div>
                                         <button
                                             type="submit"
-                                            className="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 transition-all"
+                                            className="w-full bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-700 transition-all font-sans"
                                         >
                                             Save Address
                                         </button>
@@ -357,6 +414,7 @@ const ProfileScreen = () => {
                                                         <p className="font-bold text-gray-900">{addr.name}</p>
                                                         <p className="text-sm text-gray-600 mt-1">{addr.address}, {addr.city}</p>
                                                         <p className="text-sm text-gray-600">{addr.postalCode}, {addr.country}</p>
+                                                        <p className="text-xs text-indigo-600 font-bold mt-1">{addr.phone}</p>
                                                     </div>
                                                     <button
                                                         onClick={() => deleteAddressHandler(addr._id)}

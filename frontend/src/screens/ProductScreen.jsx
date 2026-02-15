@@ -6,6 +6,7 @@ import useAuthStore from '../store/authStore';
 import Rating from '../components/Rating';
 import Message from '../components/Message';
 import Loader from '../components/Loader';
+import { Zap } from 'lucide-react';
 
 const ProductScreen = () => {
     const { id } = useParams();
@@ -127,8 +128,8 @@ const ProductScreen = () => {
                             </div>
                             <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
                                 <span className="block text-xs text-gray-500 uppercase font-bold tracking-wider mb-1">Shipping</span>
-                                <span className="text-sm font-bold text-gray-700">
-                                    {product.shippingPrice === 0 ? 'FREE Delivery' : `₹${product.shippingPrice}`}
+                                <span className="text-sm font-bold text-gray-700 leading-tight">
+                                    Calculated at checkout
                                 </span>
                             </div>
                             {product.taxPercent > 0 && (

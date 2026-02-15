@@ -13,6 +13,7 @@ const OrderScreen = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [loadingDeliver, setLoadingDeliver] = useState(false);
+    const [loadingShipped, setLoadingShipped] = useState(false);
     const [loadingReturn, setLoadingReturn] = useState(false);
     const [showReturnModal, setShowReturnModal] = useState(false);
     const [returnReason, setReturnReason] = useState('');
@@ -32,6 +33,18 @@ const OrderScreen = () => {
     useEffect(() => {
         fetchOrder();
     }, [id]);
+
+    const shippedHandler = async () => {
+        setLoadingShipped(true);
+        try {
+            await api.put(`/api/orders/${id}/shipped`);
+            await fetchOrder();
+            setLoadingShipped(false);
+        } catch (err) {
+            alert(err.response?.data?.message || err.message);
+            setLoadingShipped(false);
+        }
+    };
 
     const deliverHandler = async () => {
         setLoadingDeliver(true);
@@ -89,9 +102,11 @@ const OrderScreen = () => {
                             <p className="font-mono text-xs text-gray-400 mt-1 uppercase">ID: {order._id}</p>
                         </div>
                         <div className="flex flex-col items-end gap-2">
-                            <span className={`px-3 py-1 rounded-full text-xs font-bold ring-1 ${order.isDelivered ? 'bg-green-100 text-green-700 ring-green-200' : 'bg-amber-100 text-amber-700 ring-amber-200'
+                            <span className={`px-3 py-1 rounded-full text-xs font-bold ring-1 ${order.isDelivered ? 'bg-green-100 text-green-700 ring-green-200' :
+                                order.status === 'Shipped' ? 'bg-indigo-100 text-indigo-700 ring-indigo-200' :
+                                    'bg-amber-100 text-amber-700 ring-amber-200'
                                 }`}>
-                                {order.isDelivered ? 'Delivered' : 'Processing'}
+                                {order.isDelivered ? 'Delivered' : order.status === 'Shipped' ? 'Shipped' : 'Processing'}
                             </span>
                             <span className={`px-3 py-1 rounded-full text-xs font-bold ring-1 ${order.isPaid ? 'bg-blue-100 text-blue-700 ring-blue-200' : 'bg-red-100 text-red-700 ring-red-200'
                                 }`}>
@@ -195,7 +210,17 @@ const OrderScreen = () => {
                             </div>
 
                             {userInfo?.isAdmin && order.isPaid && !order.isDelivered && (
-                                <div className="pt-6">
+                                <div className="pt-6 space-y-3">
+                                    {order.status !== 'Shipped' && (
+                                        <button
+                                            onClick={shippedHandler}
+                                            disabled={loadingShipped}
+                                            className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 active:scale-[0.98] disabled:opacity-50"
+                                        >
+                                            {loadingShipped ? <Loader size="sm" /> : <Truck size={20} />}
+                                            Mark as Shipped
+                                        </button>
+                                    )}
                                     <button
                                         onClick={deliverHandler}
                                         disabled={loadingDeliver}

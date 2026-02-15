@@ -12,7 +12,7 @@ const getAddresses = async (req, res) => {
 // @route   POST /api/addresses
 // @access  Private
 const addAddress = async (req, res) => {
-    const { name, address, city, postalCode, country, isDefault } = req.body;
+    const { name, address, city, postalCode, country, phone, isDefault } = req.body;
 
     if (isDefault) {
         await Address.updateMany({ user: req.user._id }, { isDefault: false });
@@ -25,6 +25,7 @@ const addAddress = async (req, res) => {
         city,
         postalCode,
         country,
+        phone,
         isDefault: !!isDefault,
     });
 

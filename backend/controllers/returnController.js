@@ -1,6 +1,7 @@
 const ReturnRequest = require('../models/ReturnRequest');
 const Order = require('../models/Order');
-const { createReturnOrder } = require('../utils/shiprocket');
+const User = require('../models/User');
+const { sendReturnStatusEmail } = require('../utils/emailService');
 
 // @desc    Create new return request
 // @route   POST /api/returns
@@ -44,34 +45,6 @@ const createReturnRequest = async (req, res) => {
             });
 
             const createdRequest = await returnRequest.save();
-
-            // Notify Shiprocket if approved
-            if (status === 'Approved') {
-                try {
-                    await createReturnOrder({
-                        order_id: order._id.toString(),
-                        order_date: order.createdAt.toISOString().slice(0, 10),
-                        pickup_customer_name: order.shippingAddress.name,
-                        pickup_address: order.shippingAddress.address,
-                        pickup_city: order.shippingAddress.city,
-                        pickup_pincode: order.shippingAddress.postalCode,
-                        pickup_phone: order.shippingAddress.phone,
-                        order_items: order.orderItems.map(item => ({
-                            name: item.name,
-                            sku: item.product.toString(),
-                            units: item.qty,
-                            selling_price: item.price
-                        })),
-                        shipping_customer_name: 'NKM Trading Company',
-                        shipping_address: 'Primary Warehouse Address', // Should be from ENV
-                        shipping_city: 'Erode',
-                        shipping_pincode: '638011',
-                        shipping_phone: '9876543210'
-                    });
-                } catch (error) {
-                    console.error('Shiprocket Return Sync Failed:', error.message);
-                }
-            }
 
             // Update order status reference
             order.returnRequest = {
@@ -134,6 +107,12 @@ const updateReturnStatus = async (req, res) => {
             }
 
             const updatedRequest = await returnRequest.save();
+
+            // Send email notification
+            const user = await User.findById(returnRequest.user);
+            if (user) {
+                await sendReturnStatusEmail(updatedRequest, user);
+            }
 
             // Sync with order status
             const order = await Order.findById(returnRequest.order);

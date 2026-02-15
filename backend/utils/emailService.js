@@ -237,8 +237,118 @@ const sendOrderConfirmationEmail = async (order, user) => {
     }
 };
 
+/**
+ * Send shipment notification email
+ * @param {object} order - Order object
+ * @param {object} user - User object
+ */
+const sendShipmentEmail = async (order, user) => {
+    const transporter = createTransporter();
+
+    const mailOptions = {
+        from: process.env.EMAIL_FROM,
+        to: user.email,
+        subject: `Your Order #${order._id} Has Shipped! - Bombay Dyeing - NKM Trading Company`,
+        html: `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                    .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+                    .button { display: inline-block; padding: 12px 30px; background: #667eea; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+                    .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>🚚 Your Order is on its Way!</h1>
+                    </div>
+                    <div class="content">
+                        <h2>Hi ${user.name},</h2>
+                        <p>Great news! Your order <strong>#${order._id}</strong> has been shipped and is now on its way to you.</p>
+                        <p>You can view your order details and track its status by clicking the button below:</p>
+                        <a href="${process.env.FRONTEND_URL}/order/${order._id}" class="button">View Order</a>
+                        <p>Thank you for shopping with us!</p>
+                    </div>
+                    <div class="footer">
+                        <p>&copy; 2026 Bombay Dyeing - NKM Trading Company. All rights reserved.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log(`✅ Shipment email sent to ${user.email} for order ${order._id}`);
+    } catch (error) {
+        console.error('❌ Error sending shipment email:', error.message);
+    }
+};
+
+/**
+ * Send return status update email
+ * @param {object} returnRequest - ReturnRequest object
+ * @param {object} user - User object
+ */
+const sendReturnStatusEmail = async (returnRequest, user) => {
+    const transporter = createTransporter();
+
+    const mailOptions = {
+        from: process.env.EMAIL_FROM,
+        to: user.email,
+        subject: `Update on your ${returnRequest.type} Request - Order #${returnRequest.order}`,
+        html: `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                    .header { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                    .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+                    .status-badge { display: inline-block; padding: 5px 15px; background: #eee; border-radius: 20px; font-weight: bold; }
+                    .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>Notification: ${returnRequest.type} Update</h1>
+                    </div>
+                    <div class="content">
+                        <h2>Hi ${user.name},</h2>
+                        <p>There has been an update to your ${returnRequest.type} request for order <strong>#${returnRequest.order}</strong>.</p>
+                        <p>The current status of your request is: <span class="status-badge">${returnRequest.status}</span></p>
+                        <p>Reason provided: <em>"${returnRequest.reason}"</em></p>
+                        <p>You can check the full details in your profile under "Orders".</p>
+                    </div>
+                    <div class="footer">
+                        <p>&copy; 2026 Bombay Dyeing - NKM Trading Company. All rights reserved.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log(`✅ Return status email sent to ${user.email} for status: ${returnRequest.status}`);
+    } catch (error) {
+        console.error('❌ Error sending return status email:', error.message);
+    }
+};
+
 module.exports = {
     sendVerificationEmail,
     sendPasswordResetEmail,
     sendOrderConfirmationEmail,
+    sendShipmentEmail,
+    sendReturnStatusEmail,
 };

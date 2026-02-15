@@ -12,8 +12,10 @@ const ShippingScreen = () => {
 
     const [address, setAddress] = useState(shippingAddress.address || '');
     const [city, setCity] = useState(shippingAddress.city || '');
+    const [state, setState] = useState(shippingAddress.state || '');
     const [postalCode, setPostalCode] = useState(shippingAddress.postalCode || '');
     const [country, setCountry] = useState(shippingAddress.country || 'India');
+    const [phone, setPhone] = useState(shippingAddress.phone || '');
     const [error, setError] = useState('');
     const [addresses, setAddresses] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -35,28 +37,30 @@ const ShippingScreen = () => {
     const selectAddressHandler = (addr) => {
         setAddress(addr.address);
         setCity(addr.city);
+        setState(addr.state || '');
         setPostalCode(addr.postalCode);
         setCountry(addr.country);
+        setPhone(addr.phone || '');
     };
 
     const submitHandler = (e) => {
         e.preventDefault();
-        if (!postalCode.startsWith('600') || postalCode.length !== 6) {
-            setError('Currently, we only ship to Chennai (PIN codes starting with 600).');
+        if (postalCode.length < 6) {
+            setError('Please enter a valid 6-digit postal code.');
             return;
         }
-        saveShippingAddress({ address, city, postalCode, country });
+        if (phone.length < 10) {
+            setError('Please enter a valid phone number.');
+            return;
+        }
+        saveShippingAddress({ address, city, state, postalCode, country, phone });
         navigate('/placeorder');
     };
 
     return (
         <div className="max-w-md mx-auto mt-10">
             <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-                <h1 className="text-3xl font-bold mb-2 text-gray-900">Shipping</h1>
-                <div className="flex items-center gap-2 mb-6 bg-indigo-50 p-3 rounded-lg text-indigo-700 text-sm">
-                    <Info size={18} />
-                    <p>We are currently only delivering within <strong>Chennai</strong>.</p>
-                </div>
+                <h1 className="text-3xl font-bold mb-6 text-gray-900">Shipping</h1>
 
                 {loading ? <Loader /> : addresses.length > 0 && (
                     <div className="mb-8">
@@ -75,7 +79,8 @@ const ShippingScreen = () => {
                                         </div>
                                         <div>
                                             <p className="font-bold text-gray-800 text-sm">{addr.name}</p>
-                                            <p className="text-xs text-gray-500 truncate max-w-[200px]">{addr.address}, {addr.city}</p>
+                                            <p className="text-xs text-gray-500 truncate max-w-[180px]">{addr.address}, {addr.city}</p>
+                                            <p className="text-[10px] text-indigo-600 font-semibold">{addr.phone}</p>
                                         </div>
                                     </div>
                                     <ChevronRight size={16} className="text-gray-300 group-hover:text-indigo-500 transition-all" />
@@ -95,7 +100,7 @@ const ShippingScreen = () => {
                         <input
                             type="text"
                             required
-                            placeholder="e.g. 123 Anna Salai"
+                            placeholder="e.g. 123 Main St"
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none"
                             value={address}
                             onChange={(e) => setAddress(e.target.value)}
@@ -106,21 +111,79 @@ const ShippingScreen = () => {
                         <input
                             type="text"
                             required
-                            placeholder="Chennai"
+                            placeholder="City name"
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none"
                             value={city}
                             onChange={(e) => setCity(e.target.value)}
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-1">Postal Code (Chennai only)</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">State</label>
+                        <select
+                            required
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none"
+                            value={state}
+                            onChange={(e) => setState(e.target.value)}
+                        >
+                            <option value="">Select State</option>
+                            <option value="Andhra Pradesh">Andhra Pradesh</option>
+                            <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                            <option value="Assam">Assam</option>
+                            <option value="Bihar">Bihar</option>
+                            <option value="Chhattisgarh">Chhattisgarh</option>
+                            <option value="Goa">Goa</option>
+                            <option value="Gujarat">Gujarat</option>
+                            <option value="Haryana">Haryana</option>
+                            <option value="Himachal Pradesh">Himachal Pradesh</option>
+                            <option value="Jharkhand">Jharkhand</option>
+                            <option value="Karnataka">Karnataka</option>
+                            <option value="Kerala">Kerala</option>
+                            <option value="Madhya Pradesh">Madhya Pradesh</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Manipur">Manipur</option>
+                            <option value="Meghalaya">Meghalaya</option>
+                            <option value="Mizoram">Mizoram</option>
+                            <option value="Nagaland">Nagaland</option>
+                            <option value="Odisha">Odisha</option>
+                            <option value="Punjab">Punjab</option>
+                            <option value="Rajasthan">Rajasthan</option>
+                            <option value="Sikkim">Sikkim</option>
+                            <option value="Tamil Nadu">Tamil Nadu</option>
+                            <option value="Telangana">Telangana</option>
+                            <option value="Tripura">Tripura</option>
+                            <option value="Uttar Pradesh">Uttar Pradesh</option>
+                            <option value="Uttarakhand">Uttarakhand</option>
+                            <option value="West Bengal">West Bengal</option>
+                            <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                            <option value="Chandigarh">Chandigarh</option>
+                            <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
+                            <option value="Delhi">Delhi</option>
+                            <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                            <option value="Ladakh">Ladakh</option>
+                            <option value="Lakshadweep">Lakshadweep</option>
+                            <option value="Puducherry">Puducherry</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">Postal Code</label>
                         <input
                             type="text"
                             required
-                            placeholder="600xxx"
+                            placeholder="6-digit PIN"
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none"
                             value={postalCode}
                             onChange={(e) => setPostalCode(e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">Mobile Number</label>
+                        <input
+                            type="text"
+                            required
+                            placeholder="10-digit mobile"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
                         />
                     </div>
                     <div>

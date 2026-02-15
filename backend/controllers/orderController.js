@@ -1,8 +1,7 @@
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const User = require('../models/User');
-const { sendOrderConfirmationEmail } = require('../utils/emailService');
-const { getShippingRates, createShiprocketOrder } = require('../utils/shiprocket');
+const { sendOrderConfirmationEmail, sendShipmentEmail } = require('../utils/emailService');
 
 // @desc    Calculate shipping rates
 // @route   POST /api/orders/rates
@@ -15,33 +14,15 @@ const calculateOrderShippingRates = async (req, res) => {
     }
 
     try {
-        let totalWeight = 0;
-        let maxLength = 0;
-        let maxWidth = 0;
-        let maxHeight = 0;
+        const itemsPrice = orderItems.reduce((acc, item) => acc + item.price * item.qty, 0);
 
-        for (const item of orderItems) {
-            const product = await Product.findById(item.product);
-            if (product) {
-                totalWeight += (product.weight || 0.5) * item.qty;
-                maxLength = Math.max(maxLength, product.length || 10);
-                maxWidth = Math.max(maxWidth, product.width || 10);
-                maxHeight = Math.max(maxHeight, product.height || 10);
-            }
-        }
+        // Simplified Logic: Flat ₹50 if < ₹1000, else ₹0
+        const shippingPrice = itemsPrice >= 1000 ? 0 : 50;
 
-        const ratesResponse = await getShippingRates(
-            process.env.SHIPROCKET_PICKUP_PINCODE || '638011',
-            shippingAddress.postalCode,
-            totalWeight,
-            maxLength,
-            maxWidth,
-            maxHeight
-        );
-
-        res.json(ratesResponse);
+        console.log(`Calculating rates for ItemsPrice: ${itemsPrice}. Result: ${shippingPrice}`);
+        res.json({ rate: shippingPrice });
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching shipping rates', error: error.message });
+        res.status(500).json({ message: 'Error calculating shipping rates', error: error.message });
     }
 };
 
@@ -63,11 +44,6 @@ const addOrderItems = async (req, res) => {
         res.status(400);
         throw new Error('No order items');
     } else {
-        // Recalculate shippingPrice on server for security
-        // Inclusive of tax as per user request (totalPrice before shipping)
-        const itemsAndTax = Number(itemsPrice) + Number(taxPrice);
-        const calculatedShippingPrice = itemsAndTax > 1000 ? 0 : 50;
-
         const order = new Order({
             orderItems,
             user: req.user._id,
@@ -75,8 +51,8 @@ const addOrderItems = async (req, res) => {
             paymentMethod,
             itemsPrice,
             taxPrice,
-            shippingPrice: calculatedShippingPrice,
-            totalPrice: itemsAndTax + calculatedShippingPrice,
+            shippingPrice: Number(shippingPrice) || 0,
+            totalPrice: Number(totalPrice),
         });
 
         const createdOrder = await order.save();
@@ -88,31 +64,6 @@ const addOrderItems = async (req, res) => {
                 product.countInStock -= item.qty;
                 await product.save();
             }
-        }
-
-        // Sync with Shiprocket (Optional: usually done after payment is confirmed for prepaid, or immediately for COD)
-        // If payment is COD or already paid (e.g. manual admin entry), sync now.
-        // For simplicity and to show automation, we'll attempt sync if it's already "paid" or if we want to create as "Draft"
-        try {
-            const shiprocketOrder = await createShiprocketOrder(
-                orderItems,
-                shippingAddress,
-                createdOrder._id.toString(),
-                new Date().toISOString().slice(0, 10),
-                totalPrice
-            );
-
-            if (shiprocketOrder && shiprocketOrder.order_id) {
-                createdOrder.shiprocket = {
-                    orderId: shiprocketOrder.order_id,
-                    shipmentId: shiprocketOrder.shipment_id,
-                    shipmentStatus: 'Created'
-                };
-                await createdOrder.save();
-            }
-        } catch (error) {
-            console.error('Shiprocket Sync Failed:', error.message);
-            // We don't fail the whole order if Shiprocket sync fails, but we should log it
         }
 
         // Send order confirmation email
@@ -180,6 +131,28 @@ const getOrders = async (req, res) => {
     res.json(orders);
 };
 
+// @desc    Update order to shipped
+// @route   PUT /api/orders/:id/shipped
+// @access  Private/Admin
+const updateOrderToShipped = async (req, res) => {
+    const order = await Order.findById(req.params.id);
+
+    if (order) {
+        order.status = 'Shipped';
+        const updatedOrder = await order.save();
+
+        // Send email notification
+        const user = await User.findById(order.user);
+        if (user) {
+            await sendShipmentEmail(updatedOrder, user);
+        }
+
+        res.json(updatedOrder);
+    } else {
+        res.status(404).json({ message: 'Order not found' });
+    }
+};
+
 // @desc    Update order to delivered
 // @route   PUT /api/orders/:id/deliver
 // @access  Private/Admin
@@ -241,6 +214,7 @@ module.exports = {
     calculateOrderShippingRates,
     getOrderById,
     updateOrderToPaid,
+    updateOrderToShipped,
     updateOrderToDelivered,
     createReturnRequest,
     getMyOrders,
