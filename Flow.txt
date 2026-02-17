@@ -1,0 +1,26 @@
+Here is the full e-commerce lifecycle as it currently stands, following the removal of Shiprocket and the implementation of the simplified shipping and automated notification system.
+
+1. Product Creation (Admin)
+The flow starts in the Admin Dashboard where a store manager can create and list new products. During our verification, we confirmed the system correctly handles the creation and subsequent updates to product metadata (MRP, Tax, Discount, and Stock).
+
+2. Shopping & Checkout (Customer)
+Cart & Shipping: The customer adds items to their cart. The shipping rate is automatically calculated:
+₹50 flat rate for orders below ₹1,000.
+Free Delivery (₹0) for orders ₹1,000 and above.
+Address Selection: The customer selects their delivery address using a standardized list of all Indian States and Union Territories (removing the "Other" option to ensure data consistency).
+Payment: Upon placing the order, the customer completes the payment (integrated with Razorpay).
+Confirmation: Once paid, an automated Order Confirmation Email is sent to the customer with their order receipt and details.
+3. Order Fulfillment (Admin)
+Mark as Shipped: The admin can now mark an order as "Shipped" from the Order Details screen. This triggers an automated Shipment Email to the customer, letting them know their package is on the way.
+Mark as Delivered: Once the package reaches the customer, the admin marks it as "Delivered". This sets the deliveredAt timestamp, which is critical for the return window.
+4. Returns & Replacements (Customer)
+Requesting a Return: Customers can initiate a "Return" or "Replacement" request directly from their order history if the item has been delivered.
+7-Day Rule: If the request is made within 7 days of delivery, the system auto-approves the request (status becomes "Approved"). If outside this window, the system prevents the request.
+Notification: The customer's order status reflects the return request immediately.
+5. Return Processing (Admin)
+Approval & Status: Admins view all requests in the Return Requests list. As they update the status (e.g., from "Approved" to "Picked up" or "Completed"), the customer receives an automated Return Status Email at each step.
+Synchronization: The status in the 
+Order
+ record is kept in sync with the 
+ReturnRequest
+ record for accurate tracking across the platform.
