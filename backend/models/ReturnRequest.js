@@ -15,7 +15,7 @@ const returnRequestSchema = mongoose.Schema(
         type: {
             type: String,
             required: true,
-            enum: ['Return', 'Replace'],
+            enum: ['Return'],
         },
         reason: {
             type: String,

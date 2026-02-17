@@ -30,49 +30,83 @@ const calculateOrderShippingRates = async (req, res) => {
 // @route   POST /api/orders
 // @access  Private
 const addOrderItems = async (req, res) => {
-    const {
-        orderItems,
-        shippingAddress,
-        paymentMethod,
-        itemsPrice,
-        taxPrice,
-        shippingPrice,
-        totalPrice,
-    } = req.body;
-
-    if (orderItems && orderItems.length === 0) {
-        res.status(400);
-        throw new Error('No order items');
-    } else {
-        const order = new Order({
+    try {
+        const {
             orderItems,
-            user: req.user._id,
             shippingAddress,
             paymentMethod,
             itemsPrice,
             taxPrice,
-            shippingPrice: Number(shippingPrice) || 0,
-            totalPrice: Number(totalPrice),
+            shippingPrice,
+            totalPrice,
+        } = req.body;
+
+        console.log('Order Data Received:', {
+            itemsCount: orderItems?.length,
+            user: req.user?._id,
+            itemsPrice,
+            totalPrice
         });
 
-        const createdOrder = await order.save();
+        if (!orderItems || orderItems.length === 0) {
+            res.status(400);
+            throw new Error('No order items');
+        }
 
-        // Stock subtraction logic
+        if (!req.user) {
+            res.status(401);
+            throw new Error('User not found in request');
+        }
+
+        // Calculate tax breakdown on server side for data integrity
+        let calculatedTax = 0;
         for (const item of orderItems) {
             const product = await Product.findById(item.product);
             if (product) {
-                product.countInStock -= item.qty;
-                await product.save();
+                const taxRate = product.taxPercent || 18; // Default to 18 if missing
+                // Item price is inclusive. Tax = Price - (Price / (1 + taxPercent/100))
+                const itemTax = (item.price * item.qty) - (item.price * item.qty) / (1 + (taxRate / 100));
+                calculatedTax += itemTax;
+                console.log(`Item: ${item.name}, TaxRate: ${taxRate}, ItemTax: ${itemTax}`);
+            } else {
+                console.warn(`Product not found for item: ${item.name}`);
             }
         }
 
-        // Send order confirmation email
-        const user = await User.findById(req.user._id);
-        if (user) {
-            await sendOrderConfirmationEmail(createdOrder, user);
-        }
+        const taxBreakdown = Number(calculatedTax.toFixed(2));
+        console.log('Final Tax Breakdown:', taxBreakdown);
+
+        const orderData = {
+            orderItems: orderItems.map(item => ({
+                ...item,
+                price: Number(item.price),
+                qty: Number(item.qty),
+                product: item.product // Ensure it's a valid ID
+            })),
+            user: req.user._id,
+            shippingAddress,
+            paymentMethod,
+            itemsPrice: Number(itemsPrice),
+            taxPrice: isNaN(taxBreakdown) ? 0 : taxBreakdown,
+            shippingPrice: Number(shippingPrice) || 0,
+            totalPrice: Number(totalPrice),
+        };
+
+        console.log('Final Order Data to Save:', JSON.stringify(orderData, null, 2));
+
+        const order = new Order(orderData);
+
+        console.log('Attempting to save order to MongoDB...');
+        const createdOrder = await order.save();
+        console.log('Order created successfully:', createdOrder._id);
 
         res.status(201).json(createdOrder);
+    } catch (error) {
+        console.error('Order Creation Error:', error);
+        res.status(res.statusCode === 200 ? 500 : res.statusCode).json({
+            message: error.message || 'Error creating order',
+            stack: process.env.NODE_ENV === 'production' ? null : error.stack
+        });
     }
 };
 
@@ -109,6 +143,26 @@ const updateOrderToPaid = async (req, res) => {
         };
 
         const updatedOrder = await order.save();
+
+        // Stock subtraction logic (Only after payment)
+        for (const item of updatedOrder.orderItems) {
+            const product = await Product.findById(item.product);
+            if (product) {
+                product.countInStock -= item.qty;
+                await product.save();
+            }
+        }
+
+        // Send order confirmation email (Only after payment)
+        try {
+            const user = await User.findById(req.user._id);
+            if (user) {
+                await sendOrderConfirmationEmail(updatedOrder, user);
+            }
+        } catch (emailError) {
+            console.error('Email sending failed after payment status update:', emailError.message);
+        }
+
         res.json(updatedOrder);
     } else {
         res.status(404).json({ message: 'Order not found' });

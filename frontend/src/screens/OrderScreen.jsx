@@ -60,7 +60,7 @@ const OrderScreen = () => {
 
     const returnHandler = async () => {
         if (!returnReason) {
-            alert('Please provide a reason for return/replacement');
+            alert('Please provide a reason for return');
             return;
         }
 
@@ -81,7 +81,14 @@ const OrderScreen = () => {
     };
 
     const canReturn = () => {
-        return order && order.isDelivered && !order.returnRequest?.isReturned;
+        if (!order || !order.isDelivered || order.returnRequest?.isReturned) return false;
+
+        const deliveredAt = new Date(order.deliveredAt);
+        const now = new Date();
+        const diffTime = Math.abs(now - deliveredAt);
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+        return diffDays <= 7;
     };
 
     if (loading) return <Loader />;
@@ -148,7 +155,7 @@ const OrderScreen = () => {
                         <p className="text-sm font-medium text-gray-700 mb-2">Method: <span className="uppercase">{order.paymentMethod}</span></p>
                         {order.isPaid ? (
                             <div className="bg-green-50 text-green-700 p-3 rounded-lg text-sm font-medium border border-green-100">
-                                Paid on {order.paidAt.substring(0, 10)}
+                                Paid on {new Date(order.paidAt).toLocaleDateString()}
                             </div>
                         ) : (
                             <div className="bg-red-50 text-red-700 p-3 rounded-lg text-sm font-medium border border-red-100">
@@ -193,20 +200,20 @@ const OrderScreen = () => {
                         </div>
                         <div className="p-6 space-y-4">
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-500 font-medium">Items Subtotal</span>
-                                <span className="font-bold text-gray-900 underline decoration-indigo-100 decoration-4 underline-offset-4">₹{(order.totalPrice - order.taxPrice - order.shippingPrice).toLocaleString('en-IN')}</span>
+                                <span className="text-gray-500 font-medium">Subtotal (Excl. Tax)</span>
+                                <span className="font-bold text-gray-900 underline decoration-indigo-100 decoration-4 underline-offset-4">₹{(order.totalPrice - order.taxPrice - order.shippingPrice).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                            </div>
+                            <div className="flex justify-between text-sm text-gray-500">
+                                <span className="font-medium">GST (Included)</span>
+                                <span className="font-bold underline decoration-indigo-100 decoration-4 underline-offset-4">₹{order.taxPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-500 font-medium">Shipping Fee</span>
-                                <span className="font-bold text-gray-900 underline decoration-indigo-100 decoration-4 underline-offset-4">₹{order.shippingPrice.toLocaleString('en-IN')}</span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-gray-500 font-medium">GST (%)</span>
-                                <span className="font-bold text-gray-900 underline decoration-indigo-100 decoration-4 underline-offset-4">₹{order.taxPrice.toLocaleString('en-IN')}</span>
+                                <span className="font-bold text-gray-900 underline decoration-indigo-100 decoration-4 underline-offset-4">₹{order.shippingPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                             </div>
                             <div className="pt-4 border-t border-gray-100 flex justify-between">
-                                <span className="text-lg font-black text-gray-900 uppercase tracking-tighter">Total Price</span>
-                                <span className="text-2xl font-black text-indigo-600 tracking-tight">₹{order.totalPrice.toLocaleString('en-IN')}</span>
+                                <span className="text-lg font-black text-gray-900 uppercase tracking-tighter">Grand Total</span>
+                                <span className="text-2xl font-black text-indigo-600 tracking-tight">₹{order.totalPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                             </div>
 
                             {userInfo?.isAdmin && order.isPaid && !order.isDelivered && (
@@ -239,7 +246,7 @@ const OrderScreen = () => {
                                         className="w-full bg-amber-500 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-amber-600 transition-all shadow-lg shadow-amber-100 active:scale-[0.98]"
                                     >
                                         <Truck size={20} />
-                                        Return / Replace Order
+                                        Return Order Items
                                     </button>
                                 </div>
                             )}
@@ -266,28 +273,14 @@ const OrderScreen = () => {
             {showReturnModal && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl scale-in-center">
-                        <h2 className="text-2xl font-black text-gray-900 mb-6">Request Return / Replacement</h2>
+                        <h2 className="text-2xl font-black text-gray-900 mb-6">Request Return</h2>
                         <div className="space-y-4">
-                            <div>
-                                <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Request Type</label>
-                                <div className="flex gap-4">
-                                    {['Return', 'Replace'].map((t) => (
-                                        <button
-                                            key={t}
-                                            onClick={() => setReturnType(t)}
-                                            className={`flex-1 py-3 rounded-xl font-bold transition-all ${returnType === t ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'bg-gray-50 text-gray-500 hover:bg-gray-100'}`}
-                                        >
-                                            {t}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
                             <div>
                                 <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Reason</label>
                                 <textarea
                                     value={returnReason}
                                     onChange={(e) => setReturnReason(e.target.value)}
-                                    placeholder="Tell us why you want to return or replace this order..."
+                                    placeholder="Tell us why you want to return this order..."
                                     className="w-full bg-gray-50 border-0 rounded-2xl p-4 text-sm focus:ring-2 focus:ring-indigo-500 transition-all"
                                     rows="4"
                                 />

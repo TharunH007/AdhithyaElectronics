@@ -26,6 +26,7 @@ import FAQScreen from './screens/FAQScreen';
 import TermsScreen from './screens/TermsScreen';
 import ReturnPolicyScreen from './screens/ReturnPolicyScreen';
 import ReturnListScreen from './screens/admin/ReturnListScreen';
+import AdminLoginScreen from './screens/admin/AdminLoginScreen';
 
 function App() {
   return (
@@ -54,6 +55,7 @@ function App() {
             <Route path="/placeorder" element={<PlaceOrderScreen />} />
             <Route path="/order/:id" element={<OrderScreen />} />
             <Route path="/profile" element={<ProfileScreen />} />
+            <Route path="/admin/login" element={<AdminLoginScreen />} />
 
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminRoute />}>

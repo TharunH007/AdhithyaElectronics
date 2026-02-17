@@ -195,8 +195,20 @@ const sendOrderConfirmationEmail = async (order, user) => {
                                 </thead>
                                 <tbody>
                                     ${itemsHtml}
+                                    <tr>
+                                        <td colspan="3" style="padding: 10px; text-align: right; color: #666;">Subtotal (Excl. Tax):</td>
+                                        <td style="padding: 10px; text-align: right; color: #666;">₹${(order.totalPrice - order.taxPrice - order.shippingPrice).toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" style="padding: 10px; text-align: right; color: #666;">GST (Incl.):</td>
+                                        <td style="padding: 10px; text-align: right; color: #666;">₹${order.taxPrice.toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" style="padding: 10px; text-align: right; color: #666;">Shipping:</td>
+                                        <td style="padding: 10px; text-align: right; color: #666;">₹${order.shippingPrice.toFixed(2)}</td>
+                                    </tr>
                                     <tr class="total-row">
-                                        <td colspan="3" style="padding: 15px; text-align: right;">Total:</td>
+                                        <td colspan="3" style="padding: 15px; text-align: right;">Grand Total:</td>
                                         <td style="padding: 15px; text-align: right;">₹${order.totalPrice.toFixed(2)}</td>
                                     </tr>
                                 </tbody>

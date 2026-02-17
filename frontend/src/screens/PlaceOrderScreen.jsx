@@ -11,11 +11,21 @@ const PlaceOrderScreen = () => {
     const [shippingPrice, setShippingPrice] = useState(0);
     const [loadingShipping, setLoadingShipping] = useState(false);
     const [error, setError] = useState(null);
+    const [placingOrder, setPlacingOrder] = useState(false);
 
     // Calculate base prices
     const itemsPrice = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
-    const taxPrice = Number((0.18 * itemsPrice).toFixed(2));
-    const totalPrice = itemsPrice + shippingPrice + taxPrice;
+
+    // Calculate inclusive tax estimate for UI display (18% flat estimate or based on items)
+    const estimatedTax = cartItems.reduce((acc, item) => {
+        // Assuming 18% if not specified, but let's try to be consistent with backend
+        // This is just for UI display until order is created.
+        const taxRate = 18; // Default estimate
+        return acc + (item.price * item.qty) - (item.price * item.qty) / (1 + (taxRate / 100));
+    }, 0);
+
+    const taxPrice = 0; // Backend will calculate actual split, we keep it 0 for the "Post" part as it's inclusive
+    const totalPrice = itemsPrice + shippingPrice;
 
     useEffect(() => {
         const fetchShippingRates = async () => {
@@ -78,6 +88,8 @@ const PlaceOrderScreen = () => {
     };
 
     const placeOrderHandler = async () => {
+        setPlacingOrder(true);
+        setError(null);
         try {
             // 1. Create Order in DB
             const { data: order } = await api.post('/api/orders', {
@@ -101,6 +113,7 @@ const PlaceOrderScreen = () => {
 
             if (!res) {
                 setError('Razorpay SDK failed to load. Are you online?');
+                setPlacingOrder(false);
                 return;
             }
 
@@ -119,6 +132,11 @@ const PlaceOrderScreen = () => {
                 handler: function (response) {
                     handlePaymentSuccess(response, order._id);
                 },
+                modal: {
+                    ondismiss: function () {
+                        setPlacingOrder(false);
+                    }
+                },
                 prefill: {
                     name: userInfo.name,
                     email: userInfo.email,
@@ -133,6 +151,7 @@ const PlaceOrderScreen = () => {
 
         } catch (err) {
             setError(err.response && err.response.data.message ? err.response.data.message : err.message);
+            setPlacingOrder(false);
         }
     };
 
@@ -178,29 +197,29 @@ const PlaceOrderScreen = () => {
                     <h2 className="text-xl font-bold mb-4 border-b pb-2">Order Summary</h2>
                     <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                            <span>Items</span>
-                            <span>₹{itemsPrice.toFixed(2)}</span>
+                            <span>Subtotal (Excl. Tax)</span>
+                            <span>₹{(itemsPrice - estimatedTax).toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-gray-500">
+                            <span>GST (Included)</span>
+                            <span>₹{estimatedTax.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between">
                             <span>Shipping</span>
                             <span>{loadingShipping ? 'Calculating...' : `₹${shippingPrice.toFixed(2)}`}</span>
                         </div>
-                        <div className="flex justify-between">
-                            <span>Tax</span>
-                            <span>₹{taxPrice.toFixed(2)}</span>
-                        </div>
                         <div className="flex justify-between font-bold text-lg pt-2 border-t">
-                            <span>Total</span>
+                            <span>Grand Total</span>
                             <span>₹{totalPrice.toFixed(2)}</span>
                         </div>
                     </div>
 
                     <button
-                        className="w-full bg-indigo-600 text-white py-3 rounded font-bold hover:bg-indigo-700 transition mt-6"
-                        disabled={cartItems.length === 0}
+                        className="w-full bg-indigo-600 text-white py-3 rounded font-bold hover:bg-indigo-700 disabled:bg-indigo-400 transition mt-6"
+                        disabled={cartItems.length === 0 || placingOrder}
                         onClick={placeOrderHandler}
                     >
-                        Place Order & Pay
+                        {placingOrder ? 'Processing...' : 'Place Order & Pay'}
                     </button>
                 </div>
             </div>

@@ -58,11 +58,12 @@ const CartScreen = () => {
                         <h2 className="text-xl font-bold mb-4">
                             Subtotal ({cartItems.reduce((acc, item) => acc + item.qty, 0)}) items
                         </h2>
-                        <div className="text-2xl font-bold text-gray-800 mb-6">
+                        <div className="text-2xl font-bold text-gray-800 mb-1">
                             ₹{cartItems
                                 .reduce((acc, item) => acc + item.qty * item.price, 0)
                                 .toFixed(2)}
                         </div>
+                        <p className="text-xs text-gray-400 font-medium mb-6 italic">MRP is inclusive of all taxes</p>
                         <button
                             onClick={checkoutHandler}
                             disabled={cartItems.length === 0}

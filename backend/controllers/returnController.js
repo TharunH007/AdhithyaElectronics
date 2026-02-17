@@ -25,16 +25,18 @@ const createReturnRequest = async (req, res) => {
                 throw new Error('Return/Replacement already requested for this order');
             }
 
-            // Auto-approve if within 7 days
+            // 7-day rule check
             const deliveredAt = new Date(order.deliveredAt);
             const now = new Date();
-            const diffTime = Math.abs(now - deliveredAt);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            const diffTime = now - deliveredAt;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-            let status = 'Requested';
-            if (diffDays <= 7) {
-                status = 'Approved';
+            if (diffDays > 7) {
+                res.status(400);
+                throw new Error('Return/Replacement requests must be made within 7 days of delivery');
             }
+
+            const status = 'Requested';
 
             const returnRequest = new ReturnRequest({
                 user: req.user._id,
@@ -83,8 +85,8 @@ const getMyReturns = async (req, res) => {
 const getReturnRequests = async (req, res) => {
     try {
         const returns = await ReturnRequest.find({})
-            .populate('user', 'id name email')
-            .populate('order', 'id totalPrice');
+            .populate('user', 'id name email phone')
+            .populate('order', 'id totalPrice orderItems');
         res.json(returns);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -100,6 +102,7 @@ const updateReturnStatus = async (req, res) => {
 
         if (returnRequest) {
             returnRequest.status = req.body.status || returnRequest.status;
+            returnRequest.type = req.body.type || returnRequest.type;
 
             if (req.body.status === 'Completed') {
                 returnRequest.isProcessed = true;
@@ -118,6 +121,7 @@ const updateReturnStatus = async (req, res) => {
             const order = await Order.findById(returnRequest.order);
             if (order) {
                 order.returnRequest.status = updatedRequest.status;
+                order.returnRequest.type = updatedRequest.type;
                 await order.save();
             }
 

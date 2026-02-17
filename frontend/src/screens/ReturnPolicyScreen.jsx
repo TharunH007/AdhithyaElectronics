@@ -9,8 +9,8 @@ const ReturnPolicyScreen = () => {
                 <section className="bg-indigo-50 p-8 rounded-3xl border border-indigo-100">
                     <h2 className="text-2xl font-bold text-indigo-900 mb-4">7-Day Easy Returns</h2>
                     <p className="text-indigo-800 font-medium">
-                        We offer a hassle-free 7-day return and replacement policy for all our customers.
-                        If you are not satisfied with your purchase, you can request a return or replacement via your order history.
+                        We offer a hassle-free 7-day return policy for all our customers.
+                        If you are not satisfied with your purchase, you can request a return via your order history.
                     </p>
                 </section>
 
@@ -26,7 +26,7 @@ const ReturnPolicyScreen = () => {
                     <ol className="list-decimal pl-6 space-y-2">
                         <li>Go to <strong>My Orders</strong> in your profile.</li>
                         <li>Select the order you wish to return.</li>
-                        <li>Click <strong>Return / Replace</strong>.</li>
+                        <li>Click <strong>Return Order Items</strong>.</li>
                         <li>Provide a reason and submit your request.</li>
                     </ol>
 

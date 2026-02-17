@@ -133,8 +133,8 @@ const ProductScreen = () => {
                                 </span>
                             </div>
                             {product.taxPercent > 0 && (
-                                <div className="col-span-2 text-xs text-gray-500 italic">
-                                    *Price inclusive of {product.taxPercent}% GST
+                                <div className="col-span-2 text-xs text-indigo-600 font-bold uppercase tracking-wider">
+                                    MRP inclusive of all taxes
                                 </div>
                             )}
                         </div>

@@ -25,8 +25,9 @@ const Product = ({ product }) => {
                     {product.mrp > product.price && (
                         <span className="text-sm text-gray-400 line-through">₹{product.mrp.toLocaleString('en-IN')}</span>
                     )}
+                    <span className="text-[10px] text-gray-400 font-medium">Incl. of tax</span>
                     {product.mrp > product.price && (
-                        <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                        <span className="ml-auto text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
                             {Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF
                         </span>
                     )}
