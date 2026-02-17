@@ -1,0 +1,13 @@
+{
+    "name": "adithya-electronics",
+    "version": "1.0.0",
+    "private": true,
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "scripts": {
+        "install-all": "cd frontend && npm install && cd ../backend && npm install",
+        "build": "cd frontend && npm run build",
+        "start": "cd backend && node index.js"
+    }
+}
