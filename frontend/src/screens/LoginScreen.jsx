@@ -101,6 +101,12 @@ const LoginScreen = () => {
                     Register
                 </Link>
             </div>
+
+            <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+                <Link to="/admin/login" className="text-xs font-bold text-gray-400 uppercase tracking-widest hover:text-indigo-600 transition-colors flex items-center justify-center gap-1">
+                    <span>Admin Portal</span>
+                </Link>
+            </div>
         </div>
     );
 };

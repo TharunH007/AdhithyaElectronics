@@ -4,9 +4,18 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const path = require('path');
 
+const rateLimit = require('express-rate-limit');
 const app = express();
 
+// Rate Limiting
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: 'Too many requests from this IP, please try again after 15 minutes'
+});
+
 // Middleware
+app.use('/api/', limiter); // Apply rate limiting to all /api routes
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors({

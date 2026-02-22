@@ -59,7 +59,8 @@ const useCartStore = create(
             setCart: (items) => set({ cartItems: items }),
             saveShippingAddress: (data) => set({ shippingAddress: data }),
             savePaymentMethod: (data) => set({ paymentMethod: data }),
-            clearCart: () => set({ cartItems: [], shippingAddress: {}, paymentMethod: 'Razorpay' }),
+            clearCart: () => set({ cartItems: [] }),
+            resetCart: () => set({ cartItems: [], shippingAddress: {}, paymentMethod: 'Razorpay' }),
         }),
         {
             name: 'cart-storage',

@@ -57,10 +57,10 @@ const PlaceOrderScreen = () => {
     }, [cartItems, shippingAddress]);
 
     useEffect(() => {
-        if (!shippingAddress.address) {
+        if (cartItems.length > 0 && !shippingAddress.address) {
             navigate('/shipping');
         }
-    }, [shippingAddress, navigate]);
+    }, [shippingAddress, navigate, cartItems]);
 
     const loadRazorpayConfig = async () => {
         const { data } = await api.get('/api/payment/key');
