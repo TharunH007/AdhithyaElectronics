@@ -111,13 +111,21 @@ const Header = () => {
                                 </div>
                             </div>
                         ) : (
-                            <Link
-                                to="/login"
-                                className="text-gray-700 hover:text-indigo-600 flex items-center gap-1"
-                            >
-                                <User className="h-5 w-5" />
-                                <span>Sign In</span>
-                            </Link>
+                            <div className="flex items-center gap-4">
+                                <Link
+                                    to="/admin/login"
+                                    className="text-xs font-bold text-gray-400 uppercase tracking-widest hover:text-indigo-600 transition-colors hidden sm:block"
+                                >
+                                    Admin Portal
+                                </Link>
+                                <Link
+                                    to="/login"
+                                    className="text-gray-700 hover:text-indigo-600 flex items-center gap-1"
+                                >
+                                    <User className="h-5 w-5" />
+                                    <span>Sign In</span>
+                                </Link>
+                            </div>
                         )}
                     </div>
                 </div>
