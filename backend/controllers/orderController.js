@@ -1,7 +1,11 @@
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const User = require('../models/User');
+const Address = require('../models/Address');
 const { sendOrderConfirmationEmail, sendShipmentEmail } = require('../utils/emailService');
+const easyinvoice = require('easyinvoice');
+const fs = require('fs');
+const path = require('path');
 
 // @desc    Calculate shipping rates
 // @route   POST /api/orders/rates
@@ -100,6 +104,28 @@ const addOrderItems = async (req, res) => {
         const createdOrder = await order.save();
         console.log('Order created successfully:', createdOrder._id);
 
+        // Save address to saved addresses if it doesn't exist
+        const existingAddress = await Address.findOne({
+            user: req.user._id,
+            address: shippingAddress.address,
+            city: shippingAddress.city,
+            postalCode: shippingAddress.postalCode
+        });
+
+        if (!existingAddress) {
+            console.log('Saving new address for user...');
+            await Address.create({
+                user: req.user._id,
+                name: req.user.name,
+                address: shippingAddress.address,
+                city: shippingAddress.city,
+                state: shippingAddress.state || 'N/A',
+                postalCode: shippingAddress.postalCode,
+                country: shippingAddress.country || 'India',
+                phone: shippingAddress.phone || 'N/A'
+            });
+        }
+
         res.status(201).json(createdOrder);
     } catch (error) {
         console.error('Order Creation Error:', error);
@@ -194,6 +220,7 @@ const updateOrderToShipped = async (req, res) => {
     if (order) {
         order.status = 'Shipped';
         const updatedOrder = await order.save();
+        const populatedOrder = await Order.findById(updatedOrder._id).populate('user', 'name email');
 
         // Send email notification
         const user = await User.findById(order.user);
@@ -201,7 +228,7 @@ const updateOrderToShipped = async (req, res) => {
             await sendShipmentEmail(updatedOrder, user);
         }
 
-        res.json(updatedOrder);
+        res.json(populatedOrder);
     } else {
         res.status(404).json({ message: 'Order not found' });
     }
@@ -219,7 +246,8 @@ const updateOrderToDelivered = async (req, res) => {
         order.status = 'Delivered';
 
         const updatedOrder = await order.save();
-        res.json(updatedOrder);
+        const populatedOrder = await Order.findById(updatedOrder._id).populate('user', 'name email');
+        res.json(populatedOrder);
     } else {
         res.status(404).json({ message: 'Order not found' });
     }
@@ -263,6 +291,76 @@ const createReturnRequest = async (req, res) => {
     }
 };
 
+// @desc    Get order invoice as PDF
+// @route   GET /api/orders/:id/invoice
+// @access  Private
+const getOrderInvoice = async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id).populate('user', 'name email');
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        // Check if user is owner or admin
+        if (order.user._id.toString() !== req.user._id.toString() && !req.user.isAdmin) {
+            return res.status(401).json({ message: 'Not authorized' });
+        }
+
+        if (!order.isPaid) {
+            return res.status(400).json({ message: 'Invoice available only for paid orders' });
+        }
+
+        const data = {
+            "customize": {},
+            "images": {
+                // "logo": "https://public.easyinvoice.cloud/img/logo_en_72x72.png" 
+            },
+            "sender": {
+                "company": "Bombay Dyeing - NKM Trading Company",
+                "address": "Sample Street 123",
+                "zip": "1234 AB",
+                "city": "Sampletown",
+                "country": "India"
+            },
+            "client": {
+                "company": order.user.name,
+                "address": order.shippingAddress.address,
+                "zip": order.shippingAddress.postalCode,
+                "city": order.shippingAddress.city,
+                "country": order.shippingAddress.country
+            },
+            "information": {
+                "number": order._id.toString(),
+                "date": new Date(order.paidAt).toLocaleDateString(),
+                "due-date": new Date(order.paidAt).toLocaleDateString()
+            },
+            "products": order.orderItems.map(item => ({
+                "quantity": item.qty,
+                "description": item.name,
+                "tax-rate": 18, // Simplified for now
+                "price": item.price
+            })),
+            "bottom-notice": "Thank you for your business!",
+            "settings": {
+                "currency": "INR",
+                "tax-notation": "GST"
+            }
+        };
+
+        const result = await easyinvoice.createInvoice(data);
+        const pdfBuffer = Buffer.from(result.pdf, 'base64');
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=invoice_${order._id}.pdf`);
+        res.send(pdfBuffer);
+
+    } catch (error) {
+        console.error('Invoice Generation Error:', error);
+        res.status(500).json({ message: 'Error generating invoice', error: error.message });
+    }
+};
+
 module.exports = {
     addOrderItems,
     calculateOrderShippingRates,
@@ -273,4 +371,5 @@ module.exports = {
     createReturnRequest,
     getMyOrders,
     getOrders,
+    getOrderInvoice,
 };

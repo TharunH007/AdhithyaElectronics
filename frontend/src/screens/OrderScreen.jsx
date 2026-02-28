@@ -4,7 +4,7 @@ import useAuthStore from '../store/authStore';
 import api from '../utils/api';
 import Message from '../components/Message';
 import Loader from '../components/Loader';
-import { Package, Truck, CreditCard, ChevronLeft } from 'lucide-react';
+import { Package, Truck, CreditCard, ChevronLeft, FileText } from 'lucide-react';
 
 const OrderScreen = () => {
     const { id } = useParams();
@@ -15,6 +15,7 @@ const OrderScreen = () => {
     const [loadingDeliver, setLoadingDeliver] = useState(false);
     const [loadingShipped, setLoadingShipped] = useState(false);
     const [loadingReturn, setLoadingReturn] = useState(false);
+    const [loadingInvoice, setLoadingInvoice] = useState(false);
     const [showReturnModal, setShowReturnModal] = useState(false);
     const [returnReason, setReturnReason] = useState('');
     const [returnType, setReturnType] = useState('Return'); // 'Return' or 'Replace'
@@ -37,8 +38,8 @@ const OrderScreen = () => {
     const shippedHandler = async () => {
         setLoadingShipped(true);
         try {
-            await api.put(`/api/orders/${id}/shipped`);
-            await fetchOrder();
+            const { data } = await api.put(`/api/orders/${id}/shipped`);
+            setOrder(data);
             setLoadingShipped(false);
         } catch (err) {
             alert(err.response?.data?.message || err.message);
@@ -49,8 +50,8 @@ const OrderScreen = () => {
     const deliverHandler = async () => {
         setLoadingDeliver(true);
         try {
-            await api.put(`/api/orders/${id}/deliver`);
-            await fetchOrder();
+            const { data } = await api.put(`/api/orders/${id}/deliver`);
+            setOrder(data);
             setLoadingDeliver(false);
         } catch (err) {
             alert(err.response?.data?.message || err.message);
@@ -80,8 +81,28 @@ const OrderScreen = () => {
         }
     };
 
+    const downloadInvoiceHandler = async () => {
+        setLoadingInvoice(true);
+        try {
+            const response = await api.get(`/api/orders/${id}/invoice`, {
+                responseType: 'blob',
+            });
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `invoice_${id}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setLoadingInvoice(false);
+        } catch (err) {
+            alert(err.response?.data?.message || err.message);
+            setLoadingInvoice(false);
+        }
+    };
+
     const canReturn = () => {
-        if (!order || !order.isDelivered || order.returnRequest?.isReturned) return false;
+        if (!order || !order.isDelivered || order.returnRequest?.isReturned || userInfo?.isAdmin) return false;
 
         const deliveredAt = new Date(order.deliveredAt);
         const now = new Date();
@@ -215,6 +236,19 @@ const OrderScreen = () => {
                                 <span className="text-lg font-black text-gray-900 uppercase tracking-tighter">Grand Total</span>
                                 <span className="text-2xl font-black text-indigo-600 tracking-tight">₹{order.totalPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                             </div>
+
+                            {order.isPaid && (
+                                <div className="pt-4">
+                                    <button
+                                        onClick={downloadInvoiceHandler}
+                                        disabled={loadingInvoice}
+                                        className="w-full border-2 border-indigo-600 text-indigo-600 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-50 transition-all active:scale-[0.98] disabled:opacity-50"
+                                    >
+                                        {loadingInvoice ? <Loader size="sm" /> : <FileText size={20} />}
+                                        Download Invoice
+                                    </button>
+                                </div>
+                            )}
 
                             {userInfo?.isAdmin && order.isPaid && !order.isDelivered && (
                                 <div className="pt-6 space-y-3">

@@ -25,7 +25,10 @@ const AdminLoginScreen = () => {
         setLoading(true);
         setError(null);
         try {
-            const { data } = await api.post('/api/users/login', { email, password });
+            const { data } = await api.post('/api/users/login', {
+                email: email.toLowerCase(),
+                password
+            });
 
             if (!data.isAdmin) {
                 setError('Access Denied: This portal is for administrators only.');

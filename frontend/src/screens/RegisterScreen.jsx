@@ -9,6 +9,7 @@ const RegisterScreen = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [phone, setPhone] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [message, setMessage] = useState(null);
     const [success, setSuccess] = useState(false);
@@ -36,7 +37,7 @@ const RegisterScreen = () => {
         if (/[A-Z]/.test(pwd)) strength++;
         if (/[a-z]/.test(pwd)) strength++;
         if (/[0-9]/.test(pwd)) strength++;
-        if (/[@$!%*?&]/.test(pwd)) strength++;
+        if (/[@$!%*?&#]/.test(pwd)) strength++;
 
         if (strength <= 2) return { level: 'weak', color: 'bg-red-500', text: 'Weak', width: '33%' };
         if (strength <= 4) return { level: 'medium', color: 'bg-yellow-500', text: 'Medium', width: '66%' };
@@ -57,7 +58,12 @@ const RegisterScreen = () => {
         setValidationErrors([]);
 
         try {
-            const { data } = await api.post('/api/users', { name, email, password });
+            const { data } = await api.post('/api/users', {
+                name,
+                email: email.toLowerCase(),
+                phone,
+                password
+            });
             setSuccess(true);
             setMessage(data.message);
         } catch (err) {
@@ -95,8 +101,8 @@ const RegisterScreen = () => {
         <div className="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100 mt-10">
             <h1 className="text-2xl font-bold mb-6 text-center">Create Account</h1>
 
-            {message && <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{message}</div>}
-            {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>}
+            {message && <div className="bg-green-100 text-green-700 p-4 rounded-lg mb-6 border border-green-200">{message}</div>}
+            {error && <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-6 border border-red-200">{error}</div>}
 
             {validationErrors.length > 0 && (
                 <div className="bg-yellow-50 border border-yellow-400 text-yellow-800 px-4 py-3 rounded mb-4">
@@ -131,6 +137,19 @@ const RegisterScreen = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="Enter your email"
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-gray-700 font-semibold mb-1">Mobile Number</label>
+                    <input
+                        type="text"
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="Enter 10-digit mobile number"
+                        pattern="[0-9]{10}"
                     />
                 </div>
 

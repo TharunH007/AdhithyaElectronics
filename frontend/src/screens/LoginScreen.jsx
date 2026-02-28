@@ -40,11 +40,9 @@ const LoginScreen = () => {
                 console.error('Failed to fetch cart from DB', err);
             }
 
-            if (data.isAdmin) {
-                navigate('/admin/dashboard');
-            } else {
-                navigate(redirect);
-            }
+            // If there's no specific redirect provided, go to home
+            const target = redirect === '/' ? '/' : redirect;
+            navigate(target);
         } catch (err) {
             setError(err.response && err.response.data.message ? err.response.data.message : err.message);
         } finally {

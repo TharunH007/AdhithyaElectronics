@@ -10,6 +10,7 @@ const {
     createReturnRequest,
     getMyOrders,
     getOrders,
+    getOrderInvoice,
 } = require('../controllers/orderController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
@@ -21,5 +22,6 @@ router.route('/:id/pay').put(protect, updateOrderToPaid);
 router.route('/:id/shipped').put(protect, admin, updateOrderToShipped);
 router.route('/:id/deliver').put(protect, admin, updateOrderToDelivered);
 router.route('/:id/return').put(protect, createReturnRequest);
+router.route('/:id/invoice').get(protect, getOrderInvoice);
 
 module.exports = router;

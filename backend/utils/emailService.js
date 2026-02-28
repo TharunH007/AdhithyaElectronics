@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const easyinvoice = require('easyinvoice');
 
 // Create transporter
 const createTransporter = () => {
@@ -239,9 +240,52 @@ const sendOrderConfirmationEmail = async (order, user) => {
             </body>
             </html>
         `,
+        attachments: []
     };
 
     try {
+        // Generate Invoice for attachment
+        const data = {
+            "customize": {},
+            "sender": {
+                "company": "Bombay Dyeing - NKM Trading Company",
+                "address": "Sample Street 123",
+                "zip": "1234 AB",
+                "city": "Sampletown",
+                "country": "India"
+            },
+            "client": {
+                "company": user.name,
+                "address": order.shippingAddress.address,
+                "zip": order.shippingAddress.postalCode,
+                "city": order.shippingAddress.city,
+                "country": order.shippingAddress.country
+            },
+            "information": {
+                "number": order._id.toString(),
+                "date": new Date(order.paidAt).toLocaleDateString(),
+                "due-date": new Date(order.paidAt).toLocaleDateString()
+            },
+            "products": order.orderItems.map(item => ({
+                "quantity": item.qty,
+                "description": item.name,
+                "tax-rate": 18,
+                "price": item.price
+            })),
+            "bottom-notice": "Thank you for your business!",
+            "settings": {
+                "currency": "INR",
+                "tax-notation": "GST"
+            }
+        };
+
+        const result = await easyinvoice.createInvoice(data);
+        mailOptions.attachments.push({
+            filename: `invoice_${order._id}.pdf`,
+            content: result.pdf,
+            encoding: 'base64'
+        });
+
         await transporter.sendMail(mailOptions);
         console.log(`✅ Order confirmation email sent to ${user.email} for order ${order._id}`);
     } catch (error) {

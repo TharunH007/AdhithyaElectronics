@@ -29,8 +29,8 @@ const validatePassword = (password) => {
         errors.push('Password must contain at least one number');
     }
 
-    if (!/[@$!%*?&]/.test(password)) {
-        errors.push('Password must contain at least one special character (@$!%*?&)');
+    if (!/[@$!%*?&#]/.test(password)) {
+        errors.push('Password must contain at least one special character (@$!%*?&#)');
     }
 
     return {
@@ -52,7 +52,7 @@ const getPasswordStrength = (password) => {
     if (/[A-Z]/.test(password)) strength++;
     if (/[a-z]/.test(password)) strength++;
     if (/[0-9]/.test(password)) strength++;
-    if (/[@$!%*?&]/.test(password)) strength++;
+    if (/[@$!%*?&#]/.test(password)) strength++;
 
     if (strength <= 2) return 'weak';
     if (strength <= 4) return 'medium';

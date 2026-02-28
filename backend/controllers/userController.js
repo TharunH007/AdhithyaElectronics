@@ -9,7 +9,8 @@ const { sendVerificationEmail, sendPasswordResetEmail } = require('../utils/emai
 // @route   POST /api/users/login
 // @access  Public
 const authUser = async (req, res) => {
-    const { email, password } = req.body;
+    const email = req.body.email ? req.body.email.toLowerCase() : '';
+    const { password } = req.body;
 
     const user = await User.findOne({ email });
 
@@ -39,7 +40,14 @@ const authUser = async (req, res) => {
 // @route   POST /api/users
 // @access  Public
 const registerUser = async (req, res) => {
-    const { name, email, password, phone } = req.body;
+    const name = req.body.name;
+    const email = req.body.email ? req.body.email.toLowerCase() : '';
+    const password = req.body.password;
+    const phone = req.body.phone;
+
+    if (!phone) {
+        return res.status(400).json({ message: 'Phone number is required' });
+    }
 
     // Validate password strength
     const passwordValidation = validatePassword(password);
@@ -150,7 +158,7 @@ const verifyEmail = async (req, res) => {
 // @route   POST /api/users/forgot-password
 // @access  Public
 const forgotPassword = async (req, res) => {
-    const { email } = req.body;
+    const email = req.body.email ? req.body.email.toLowerCase() : '';
 
     const user = await User.findOne({ email });
 
@@ -214,7 +222,7 @@ const updateUserProfile = async (req, res) => {
 
     if (user) {
         user.name = req.body.name || user.name;
-        user.email = req.body.email || user.email;
+        user.email = req.body.email ? req.body.email.toLowerCase() : user.email;
         user.phone = req.body.phone || user.phone;
 
         if (req.body.password) {
